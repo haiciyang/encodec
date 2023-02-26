@@ -1,0 +1,68 @@
+description: Use empty-removed data
+
+target:
+  service: sing
+  # name: msrresrchvc
+  # workspace_name: msrresrchws 
+  name: msroctovc 
+  workspace_name: msroctows
+
+storage:
+  data:
+    storage_account_name: itpeus4data
+    container_name: v-haici
+    mount_dir: /mnt/shared_data
+
+data:
+  # remote_dir: data/dns_pth/dns_pth
+  remote_dir: data/dns_pth_remove_empty/dns_pth
+
+environment:
+  # image: base/job/pytorch/ptca-1.12.1-cuda11.6:20221018T172520722  # username: publicrepository
+  # image: amlt-sing/pytorch-1.11.0
+  image: amlt-sing/pytorch-1.9.0-cuda11.3-cudnn8-devel
+  # image: amlt-sing/pytorch-1.11.0
+  # image: pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
+  # registry: docker.io # any public registry can be specified here
+  setup:
+    - pip install --upgrade pip
+    - pip install einops --user
+    - pip install torch==1.12.1
+    - pip install torchaudio==0.12
+    - pip install scipy --user
+    # - pip install asteroid
+
+code:
+  local_dir: $CONFIG_DIR
+
+jobs:
+- name: dist_8542_3
+  sku: G8
+  process_count_per_node: 8
+  command:
+  - python3 -m encodec.dist_train --use_disc --bandwidth 3
+# - name: manual_no_disc
+#   sku: G8
+#   process_count_per_node: 8
+#   command:
+#   - python3 -m encodec.manual_dist_train
+# - name: manual_use_balancer_1
+#   sku: G8
+#   process_count_per_node: 8
+#   command:
+#   - python3 -m encodec.manual_dist_train --use_disc --disc_freq 1
+# - name: manual_use_balancer_50
+#   sku: G8
+#   process_count_per_node: 8
+#   command:
+#   - python3 -m encodec.manual_dist_train --use_disc --disc_freq 50
+# - name: manual_10_multi
+#   sku: G8
+#   process_count_per_node: 8
+#   command:
+#   - python3 -m encodec.manual_dist_train --use_disc --multi
+# - name: manual_dist
+#   sku: G8
+#   process_count_per_node: 8
+#   command:
+#   - python3 -m encodec.manual_dist_train --use_disc

@@ -1,0 +1,43 @@
+description: Running baseline EnCodec
+
+target:
+  service: amlk8s
+  name: itplabrr1cl1
+  vc: resrchvc
+
+environment:
+  image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
+  # image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
+  registry: docker.io # any public registry can be specified here
+  setup:
+    - pip install einops --user
+    - pip install torchaudio==0.8
+    - pip install scipy --user
+    - pip install numpy --user
+
+code:
+  local_dir: $CONFIG_DIR
+
+storage:
+  data:
+    storage_account_name: itpeus4data
+    container_name: v-haici
+    mount_dir: /mnt/shared_data
+
+data:
+  remote_dir: data/dns_spk
+
+# list of jobs to run, we run 2 jobs in this example
+jobs:
+- name: dist_test
+  sku: G8
+  process_count_per_node: -1
+  command:
+  # - python3 -m torch.distributed.launch --nnode=1 --node_rank=0 --nproc_per_node=4 -m encodec.dist_train --local_world_size=4 
+  - python3 -m encodec.dist_train
+
+
+# - name: low_lr
+#   sku: G1
+#   command:
+#   - python main.py --lr 0.1

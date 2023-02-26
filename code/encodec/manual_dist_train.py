@@ -47,10 +47,10 @@ def melspec_loss(s, s_hat, gpu_rank, n_freq):
     
     return loss
 
-def train(model, disc, train_loader, optimizer_G, optimizer_D, gpu_rank, use_disc, disc_freq):
+def train(model, disc, train_loader, optimizer_G, optimizer_D, gpu_rank, use_disc, disc_freq, debug):
 
     # ---------- Run model ------------
-    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss = 0,0,0,0,0,0
+    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, d_real_loss, d_fake_loss = 0,0,0,0,0,0,0,0
 
     model.train()
     for idx, s in enumerate(train_loader):
@@ -102,13 +102,13 @@ def train(model, disc, train_loader, optimizer_G, optimizer_D, gpu_rank, use_dis
             g_loss += l_g.detach().data.cpu()
             feat_loss += l_feat.detach().data.cpu()
 
-            # l_w.backward(retain_graph=True)
-            # losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
-            # balancer = Balancer(weights={'l_t': 0.1, 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
-            # balancer.backward(losses, s_hat)
+            l_w.backward(retain_graph=True)
+            losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
+            balancer = Balancer(weights={'l_t': 0.1, 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
+            balancer.backward(losses, s_hat)
 
-            loss = 0.1 * l_t + l_f + 3 * l_g + 3 * l_feat + l_w
-            loss.backward()
+            # loss = 0.1 * l_t + l_f + 3 * l_g + 3 * l_feat + 10 * l_w
+            # loss.backward()
             
             sync_grad(model.parameters())
             optimizer_G.step()
@@ -117,37 +117,42 @@ def train(model, disc, train_loader, optimizer_G, optimizer_D, gpu_rank, use_dis
             if idx % disc_freq == 0:
                 optimizer_D.zero_grad()
 
-                l_d = 0
+                l_d_real = 0
+                l_d_fake = 0
                 s_disc_r, fmap_r = disc(s) # list of the outputs from each discriminator
                 s_disc_gen, fmap_gen = disc(s_hat.detach())
             
                 for d_id in range(len(fmap_r)):
-                    l_d += 1/K * torch.mean(torch.max(torch.tensor(0), 1-s_disc_r[d_id]) + torch.max(torch.tensor(0), 1+s_disc_gen[d_id])) # Disc loss
-
+                    l_d_real += 1/K * torch.mean(torch.max(torch.tensor(0), 1-s_disc_r[d_id]))
+                    l_d_fake += 1/K * torch.mean(torch.max(torch.tensor(0), 1+s_disc_gen[d_id]))
+                l_d = l_d_real + l_d_fake
                 l_d.backward()
                 sync_grad(disc.parameters())
                 optimizer_D.step()
 
                 d_loss += l_d.detach().data.cpu()
+                d_real_loss += l_d_real.detach().data.cpu()
+                d_fake_loss += l_d_fake.detach().data.cpu()
 
             dist.barrier()
-            losses = {'l_g': g_loss/len(train_loader), 'l_d': d_loss/len(train_loader)*disc_freq, 'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader), 'l_feat': feat_loss/len(train_loader)}
+            losses = {'l_g': g_loss/len(train_loader), 'l_d': d_loss/len(train_loader)*disc_freq, 'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader), 'l_feat': feat_loss/len(train_loader), 'l_d_real': d_real_loss/len(train_loader)*disc_freq, 'l_d_fake': d_fake_loss/len(train_loader)*disc_freq}
 
         else:
-            loss = l_t + l_f + l_w
+            loss = 0.1 * l_t + l_f + l_w
             loss.backward()
             sync_grad(model.parameters())
             optimizer_G.step()
 
             losses = {'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader)}
         
+        if debug:
+            break
+
     return losses
 
 
     
-
-
-def valid(model, disc, valid_loader, gpu_rank):
+def valid(model, disc, valid_loader, gpu_rank, debug):
 
     # ---------- Run model ------------
     g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss = 0,0,0,0,0,0
@@ -164,10 +169,8 @@ def valid(model, disc, valid_loader, gpu_rank):
         qtz_emb = quantizedResult.quantized
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
-
         # ---- VQ Commitment loss l_w -----
         l_w = quantizedResult.penalty # commitment loss
-
 
         # ------ Reconstruction loss l_t, l_s --------
         l_t = torch.mean(torch.abs(s - s_hat))
@@ -177,7 +180,9 @@ def valid(model, disc, valid_loader, gpu_rank):
         t_loss += l_t.detach().data.cpu()
         f_loss += l_f.detach().data.cpu()
         w_loss += l_w.detach().data.cpu()
-        # break
+        
+        if debug:
+            break
         
     losses = {'val_l_t': t_loss/len(train_loader), 'val_l_f': f_loss/len(train_loader)}
 
@@ -225,9 +230,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Encodec_baseline")
     parser.add_argument("--output_dir", type=str, default=os.getenv("AMLT_OUTPUT_DIR", "/tmp"))
     parser.add_argument("--data_path", type=str, default=os.environ.get("AMLT_DATA_DIR", ".")+'/*')
+    # parser.add_argument("--data_path", type=str, default='/home/v-haiciyang/data/haici/dns_pth/*')
     parser.add_argument("--disc_freq", type=int, default=1)
     parser.add_argument('--multi', dest='multi', action='store_true')
     parser.add_argument('--use_disc', dest='use_disc', action='store_true')
+    parser.add_argument('--debug', dest='debug', action='store_true')
 
     # parser.add_argument("--local_rank", type=int, default=0)
     # parser.add_argument("--local_world_size", type=int, default=1)
@@ -242,11 +249,15 @@ if __name__ == '__main__':
     gpus_per_node = torch.cuda.device_count()
     world_size = args.get("WORLD_SIZE")
     gpu_rank = args.get("LOCAL_RANK")
-    # node_rank = 0 #tmp
+    if inp_args.debug:
+        node_rank = 0
     global_rank = node_rank * gpus_per_node + gpu_rank
     dist.init_process_group(
         backend="nccl", init_method=master_uri, world_size=world_size, rank=global_rank
     )
+
+    
+    data_path = inp_args.data_path if not inp_args.debug else '/home/v-haiciyang/data/haici/dns_pth/*'
 
     # print(f'gpu_rank: {gpu_rank}')
 
@@ -256,8 +267,8 @@ if __name__ == '__main__':
     # n = torch.cuda.device_count() // args.local_world_size
     # device_ids = list(range(args.local_rank * n, (args.local_rank + 1) * n))    
 
-    train_dataset = EnCodec_data(inp_args.data_path, task = 'train', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
-    valid_dataset = EnCodec_data(inp_args.data_path, task = 'valid', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
+    train_dataset = EnCodec_data(data_path, task = 'train', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
+    valid_dataset = EnCodec_data(data_path, task = 'valid', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
 
     train_sampler = DistributedSampler(dataset=train_dataset, shuffle=True) 
     valid_sampler = DistributedSampler(dataset=valid_dataset, shuffle=True) 
@@ -272,7 +283,7 @@ if __name__ == '__main__':
     torch.cuda.set_device(gpu_rank)
     # get new model
     model = EncodecModel._get_model(
-                   target_bandwidths = [6], 
+                   target_bandwidths = [1.5, 3, 6], 
                    sample_rate = 16000,  # 24_000
                    channels  = 1,
                    causal  = True,
@@ -291,9 +302,9 @@ if __name__ == '__main__':
         
         train_loader.sampler.set_epoch(epoch)
         tr_losses = train(model, disc, train_loader, optimizer_G,
-         optimizer_D, gpu_rank, inp_args.use_disc, inp_args.disc_freq)
+         optimizer_D, gpu_rank, inp_args.use_disc, inp_args.disc_freq, inp_args.debug)
         with torch.no_grad():
-            val_losses = valid(model, disc, valid_loader, gpu_rank)
+            val_losses = valid(model, disc, valid_loader, gpu_rank, inp_args.debug)
 
         run = Run.get_context()
 
@@ -305,9 +316,8 @@ if __name__ == '__main__':
                 run.log(key, value.item())
             # print(val_losses)
 
-            if epoch%100 == 0:
+            if (epoch+1)%100 == 0:
                 torch.save(model.state_dict(), inp_args.output_dir + "/epoch{}_model.amlt".format(str(epoch)))
-
 
     dist.destroy_process_group()
 

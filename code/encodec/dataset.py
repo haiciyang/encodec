@@ -22,6 +22,7 @@ class EnCodec_data(Dataset):
 		self.seq_len_p_sec = seq_len_p_sec
 		self.sample_rate = sample_rate
 		self.multi = multi
+		self.max_seg = 0
 
 	def __len__(self):
 
@@ -61,18 +62,32 @@ class EnCodec_data(Dataset):
 
 		seg_l = glob.glob(spk_folder + '/*.pth') # Leave the rest for eval and test
 
+		len_seg = len(seg_l)
+		valid_num = len_seg//10 + 1
+		train_num = len_seg - valid_num
+
+		
 		if self.task == 'train':
-			seg_id = torch.randint(max(1, len(seg_l)-2), (1,))
+			seg_id = torch.randint(train_num, (1,))
 		elif self.task == 'valid':
-			seg_id = torch.randint(2, (1,))
+			seg_id = torch.randint(valid_num, (1,))
 			seg_id = - (seg_id + 1) # -1 or -2
 		elif self.task == 'eval':
 			seg_id = -2
 		else:
 			print('Task can only be train or valid.')
 
-
 		seg = torch.load(seg_l[seg_id])
+
+		# Normalize and add random gain
+		seg = seg / (np.std(seg) + 1e-20)
+		# self.max_seg = max(max(seg), self.max_seg)
+		# seg /= np.max(seg)
+		
+		gain = np.random.randint(-10, 7, (1,))
+		scale = np.power(10, gain/20)
+		seg *= scale
+
 
 		return seg
 

@@ -1,0 +1,75 @@
+description: Running baseline EnCodec
+
+target:
+  service: amlk8s
+  # run "amlt target list amlk8s" to list the names of available AMLK8s targets
+  name: itplabrr1cl1
+  vc: resrchvc
+  # name: ms-shared
+
+
+
+environment:
+  # image: pytorch/pytorch:1.4-cuda10.1-cudnn7-devel
+  image: pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
+  # image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
+  # image: pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel
+  # image: pytorch/pytorch
+  # image: cyzheng/lmdb:ubuntu18.04-cuda10.2-pytorch1.7.1-v2
+  registry: docker.io # any public registry can be specified here
+  setup:
+    - pip install einops --user
+    - pip install torchaudio==0.12
+    - pip install scipy --user
+
+code:
+  local_dir: $CONFIG_DIR
+
+storage:
+  data:
+    storage_account_name: itpeus4data
+    container_name: v-haici
+    mount_dir: /mnt/shared_data
+
+data:
+  # location of the tar balls relative to the container
+  # local_dir: /home/v-haiciyang/data/haici/dns_pth/
+  remote_dir: data/dns_pth/dns_pth
+  # storage_id: data
+
+# list of jobs to run, we run 2 jobs in this example
+
+jobs:
+- name: std_only
+  sku: G8
+  # mpi
+  process_count_per_node: 8
+  command:
+  - python3 -m encodec.dist_train --disc_freq 10 --use_disc
+
+- name: std_only_multi
+  sku: G8
+  # mpi
+  process_count_per_node: 8
+  command:
+  - python3 -m encodec.dist_train --multi --disc_freq 10 --use_disc
+
+
+# - name: manual_dist_single
+#   sku: G4
+#   process_count_per_node: -1
+#   command:
+#   - python3 -m encodec.manual_dist_train
+
+# - name: dist_multi
+#   sku: G8
+#   process_count_per_node: -1
+#   command:
+#   - python3 -m encodec.dist_train --multi
+
+# - name: manual_dist_multi
+#   sku: G4
+#   process_count_per_node: 4
+#   command:
+#   - python3 -m encodec.manual_dist_train --multi
+

@@ -7,10 +7,11 @@
 """EnCodec model implementation."""
 
 import math
-from pathlib import Path
-import typing as tp
-
 import numpy as np
+import typing as tp
+from pathlib import Path
+from einops import rearrange, repeat
+
 import torch
 from torch import nn
 

@@ -99,10 +99,12 @@ if __name__ == '__main__':
         
     parser = argparse.ArgumentParser(description="Encodec_baseline")
     parser.add_argument("--data_path", type=str, default='/home/v-haiciyang/data/haici/dns_pth/*')
-    parser.add_argument("--note2", type=str, default='')
+    parser.add_argument("--model_path", type=str, default='/home/v-haiciyang/amlt/really_with_balancer/manual_use_balancer_50/epoch1600_model.amlt')
+    parser.add_argument("--note2", type=str, default='manual_balancer_50_1600_6')
     parser.add_argument('--multi', dest='multi', action='store_true')
     parser.add_argument('--sr', type=int, default=16000)
     parser.add_argument('--bandwidth', type=float, default=6.0)
+
     
     inp_args = parser.parse_args()
 
@@ -124,7 +126,7 @@ if __name__ == '__main__':
     # get new model
     else:
         model = EncodecModel._get_model(
-                    target_bandwidths = [6], 
+                    target_bandwidths = [1.5, 3, 6], 
                     sample_rate = 16000,  # 24_000
                     channels  = 1,
                     causal  = True,
@@ -133,7 +135,7 @@ if __name__ == '__main__':
                     segment = None, # tp.Optional[float]
                     name = 'unset').cuda()
 
-        state_dict = torch.load('/home/v-haiciyang/amlt/use_mean/manual_10_multi/epoch1900_model.amlt')
+        state_dict = torch.load(inp_args.model_path)
         model_dict = OrderedDict()
         pattern = re.compile('module.')
         for k,v in state_dict.items():
@@ -177,13 +179,12 @@ if __name__ == '__main__':
 
         if inp_args.sr != 16000:
             s_hat = signal.resample(s_hat.squeeze().cpu().data.numpy(), 16000*5)
-            s_hat = s_hat
         else:
-            s_hat = s_hat.squeeze().cpu().data.numpy().astype(np.int16)
+            s_hat = s_hat.squeeze().cpu().data.numpy()
         
 
-        # wavfile.write(f"eval_wavs/s{idx}_{note1}_{note2}.wav", 16000, s.squeeze().cpu().data.numpy().astype(np.int16))
-        wavfile.write(f"eval_wavs/sh{idx}_{note1}_{note2}.wav", 16000, s_hat)
+        wavfile.write(f"eval_wavs/s{idx}_{note1}_{note2}.wav", 16000, s.squeeze().cpu().data.numpy())
+        wavfile.write(f"eval_wavs/sh{idx}_{note1}_{note2}.wav", 16000, s_hat/max(s_hat))
 
         break
 
