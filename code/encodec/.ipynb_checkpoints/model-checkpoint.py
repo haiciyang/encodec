@@ -29,6 +29,47 @@ ROOT_URL = 'https://dl.fbaipublicfiles.com/encodec/v0/'
 EncodedFrame = tp.Tuple[torch.Tensor, tp.Optional[torch.Tensor]]
 
 
+class LMModel(nn.Module):
+    """Language Model to estimate probabilities of each codebook entry.
+    We predict all codebooks in parallel for a given time step.
+
+    Args:
+        n_q (int): number of codebooks.
+        card (int): codebook cardinality.
+        dim (int): transformer dimension.
+        **kwargs: passed to `encodec.modules.transformer.StreamingTransformerEncoder`.
+    """
+    def __init__(self, n_q: int = 32, card: int = 1024, dim: int = 200, **kwargs):
+        super().__init__()
+        self.card = card
+        self.n_q = n_q
+        self.dim = dim
+        self.transformer = m.StreamingTransformerEncoder(dim=dim, **kwargs)
+        self.emb = nn.ModuleList([nn.Embedding(card + 1, dim) for _ in range(n_q)])
+        self.linears = nn.ModuleList([nn.Linear(dim, card) for _ in range(n_q)])
+
+    def forward(self, indices: torch.Tensor,
+                states: tp.Optional[tp.List[torch.Tensor]] = None, offset: int = 0):
+        """
+        Args:
+            indices (torch.Tensor): indices from the previous time step. Indices
+                should be 1 + actual index in the codebook. The value 0 is reserved for
+                when the index is missing (i.e. first time step). Shape should be
+                `[B, n_q, T]`.
+            states: state for the streaming decoding.
+            offset: offset of the current time step.
+
+        Returns a 3-tuple `(probabilities, new_states, new_offset)` with probabilities
+        with a shape `[B, card, n_q, T]`.
+
+        """
+        B, K, T = indices.shape
+        input_ = sum([self.emb[k](indices[:, k]) for k in range(K)])
+        out, states, offset = self.transformer(input_, states, offset)
+        logits = torch.stack([self.linears[k](out) for k in range(K)], dim=1).permute(0, 3, 1, 2)
+        return torch.softmax(logits, dim=1), states, offset
+
+
 class EncodecModel(nn.Module):
     """EnCodec model operating on the raw waveform.
     Args:
@@ -160,27 +201,27 @@ class EncodecModel(nn.Module):
                              f"Select one of {self.target_bandwidths}.")
         self.bandwidth = bandwidth
 
-    # def get_lm_model(self) -> LMModel:
-    #     """Return the associated LM model to improve the compression rate.
-    #     """
-    #     torch.manual_seed(1234)  # todo remove: this
-    #     device = next(self.parameters()).device
-    #     lm = LMModel(self.quantizer.n_q, self.quantizer.bins, num_layers=5, dim=200,
-    #                  past_context=int(3.5 * self.frame_rate)).to(device)
-    #     checkpoints = {
-    #         'encodec_24khz': 'encodec_lm_24khz-1608e3c0.th',
-    #         'encodec_48khz': 'encodec_lm_48khz-7add9fc3.th',
-    #     }
-    #     try:
-    #         checkpoint_name = checkpoints[self.name]
-    #     except KeyError:
-    #         raise RuntimeError("No LM pre-trained for the current Encodec model.")
-    #     url = _get_checkpoint_url(ROOT_URL, checkpoint_name)
-    #     state = torch.hub.load_state_dict_from_url(
-    #         url, map_location='cpu', check_hash=True)  # type: ignore
-    #     lm.load_state_dict(state)
-    #     lm.eval()
-    #     return lm
+    def get_lm_model(self) -> LMModel:
+        """Return the associated LM model to improve the compression rate.
+        """
+        torch.manual_seed(1234)  # todo remove: this
+        device = next(self.parameters()).device
+        lm = LMModel(self.quantizer.n_q, self.quantizer.bins, num_layers=5, dim=200,
+                     past_context=int(3.5 * self.frame_rate)).to(device)
+        checkpoints = {
+            'encodec_24khz': 'encodec_lm_24khz-1608e3c0.th',
+            'encodec_48khz': 'encodec_lm_48khz-7add9fc3.th',
+        }
+        try:
+            checkpoint_name = checkpoints[self.name]
+        except KeyError:
+            raise RuntimeError("No LM pre-trained for the current Encodec model.")
+        url = _get_checkpoint_url(ROOT_URL, checkpoint_name)
+        state = torch.hub.load_state_dict_from_url(
+            url, map_location='cpu', check_hash=True)  # type: ignore
+        lm.load_state_dict(state)
+        lm.eval()
+        return lm
 
     @staticmethod
     def _get_model(target_bandwidths: tp.List[float],

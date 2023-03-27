@@ -49,17 +49,59 @@ def melspec_loss(s, s_hat, gpu_rank, n_freq):
     
     return loss
 
+def train(model, disc, train_loader, optimizer_G, optimizer_D, gpu_rank):
+
+    # ---------- Run model ------------
+    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss = 0,0,0,0,0,0
+
+    
+
+def valid(model, valid_loader, gpu_rank):
+
+    # ---------- Run model ------------
+    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss = 0,0,0,0,0,0
+    
+    model.eval()
+
+    for s in valid_loader:
+
+        # s shape (64, 1, 16000)
+        s = s.unsqueeze(1).to(torch.float).cuda(gpu_rank)
+
+        emb = model.module.encoder(s) # [64, 128, 50]
+        quantizedResult = model.module.quantizer(emb, sample_rate=16000) 
+            # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
+        qtz_emb = quantizedResult.quantized
+        s_hat = model.module.decoder(qtz_emb) #(64, 1, 16000)
+
+
+        # ---- VQ Commitment loss l_w -----
+        l_w = quantizedResult.penalty # commitment loss
+
+        # ------ Reconstruction loss l_t, l_f --------
+        l_t = torch.sum(torch.abs(s - s_hat))
+        l_f = melspec_loss(s, s_hat, gpu_rank, [7, 10])
+
+
+        t_loss += l_t.detach().data.cpu()
+        f_loss += l_f.detach().data.cpu()
+        w_loss += l_w.detach().data.cpu()
+
+    losses = {'val_l_t': t_loss/len(valid_loader), 'val_l_f': f_loss/len(valid_loader)}
+
+    return losses
+
 
 if __name__ == '__main__':
 
         
     parser = argparse.ArgumentParser(description="Encodec_baseline")
     parser.add_argument("--data_path", type=str, default='/data/hy17/dns_pth/*')
-    parser.add_argument("--model_path", type=str, default='/home/hy17/Projects/encodec/saved_models/multi_encodec_3.amlt')
-    parser.add_argument("--note2", type=str, default='')
+    parser.add_argument("--model_path", type=str, default='/home/v-haiciyang/amlt/really_with_balancer/manual_use_balancer_50/epoch1600_model.amlt')
+    parser.add_argument("--note2", type=str, default='manual_balancer_50_1600_6')
     parser.add_argument('--multi', dest='multi', action='store_true')
-    parser.add_argument('--sr', type=int, default=16000)
-    parser.add_argument('--bandwidth', type=float, default=3.0)
+    parser.add_argument('--sr', type=int, default=24000)
+    parser.add_argument('--bandwidth', type=float, default=6.0)
 
     
     inp_args = parser.parse_args()
@@ -101,7 +143,6 @@ if __name__ == '__main__':
             else:
                 model_dict = state_dict
         model.load_state_dict(model_dict)
-        # fake()
 
         model.set_target_bandwidth(inp_args.bandwidth)
 

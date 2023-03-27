@@ -15,14 +15,30 @@ from torchaudio import transforms
 import torch.multiprocessing as mp
 from torch.distributions.normal import Normal
 from torch.utils.data import Dataset, DataLoader
+from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data.distributed import DistributedSampler
 
-from azureml.core.run import Run
+# from azureml.core.run import Run
 
-from .dataset import EnCodec_data
+from .dataset_stable import EnCodec_data
 from .model import EncodecModel
 from .msstftd import MultiScaleSTFTDiscriminator as MSDisc
 from .balancer import Balancer
+
+def cal_sdr(s, s_hat):
+
+    if len(s.shape) == 3:
+        B, C, L = s.shape
+        s = s.reshape(B*C, L)
+    if len(s_hat.shape) == 3:
+        B, C, L = s_hat.shape
+        s_hat = s_hat.reshape(B*C, L)
+
+     # s, s_hat - (bt, L)
+    return torch.mean(
+        -10 * torch.log10(
+        torch.sum((s - s_hat)**2, -1) / torch.sum(s**2, -1))
+    )
 
 
 def melspec_loss(s, s_hat, gpu_rank, n_freq):
@@ -52,17 +68,18 @@ def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_ra
     g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss = 0,0,0,0,0,0
 
     model.train()
-    for idx, s in enumerate(train_loader):
-
+    for idx, batch in enumerate(train_loader):
+        
+        s = batch[0]
         # s shape (64, 1, 16000)
         s = s.unsqueeze(1).to(torch.float).cuda(gpu_rank)
 
-        emb = model.module.encoder(s) # [64, 128, 50]
-        frame_rate = 16000 // model.module.encoder.hop_length
-        quantizedResult = model.module.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
+        emb = model.encoder(s) # [64, 128, 50]
+        frame_rate = 16000 // model.encoder.hop_length
+        quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
-        s_hat = model.module.decoder(qtz_emb) #(64, 1, 16000)
+        s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
         
         # --- Update Generator ---
         optimizer_G.zero_grad()
@@ -128,14 +145,14 @@ def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_ra
 
                 d_loss += l_d.detach().data.cpu()
 
-            dist.barrier()
+            # dist.barrier()
             losses = {'l_g': g_loss/len(train_loader), 'l_d': d_loss/len(train_loader)*disc_freq, 'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader), 'l_feat': feat_loss/len(train_loader)}
 
         else:
             loss = 0.1 * l_t + l_f + l_w
             loss.backward()
             optimizer_G.step()
-            dist.barrier()
+            # dist.barrier()
 
             losses = {'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader)}
         if debug:
@@ -146,39 +163,34 @@ def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_ra
 def valid(model, valid_loader, bandwidth, gpu_rank, debug):
 
     # ---------- Run model ------------
-    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss = 0,0,0,0,0,0
+    t_loss, sdr_tt = 0, 0
     
     model.eval()
 
-    for s in valid_loader:
+    for batch in valid_loader:
 
         # s shape (64, 1, 16000)
+        s = batch[0]
         s = s.unsqueeze(1).to(torch.float).cuda(gpu_rank)
 
-        emb = model.module.encoder(s) # [64, 128, 50]
-        frame_rate = 16000 // model.module.encoder.hop_length
-        quantizedResult = model.module.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
+        emb = model.encoder(s) # [64, 128, 50]
+        frame_rate = 16000 // model.encoder.hop_length
+        quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
-        s_hat = model.module.decoder(qtz_emb) #(64, 1, 16000)
-
-
-        # ---- VQ Commitment loss l_w -----
-        l_w = quantizedResult.penalty # commitment loss
+        s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # ------ Reconstruction loss l_t, l_f --------
         l_t = torch.mean(torch.abs(s - s_hat))
-        # l_f = melspec_loss(s, s_hat, gpu_rank, [7, 10])
-
-
         t_loss += l_t.detach().data.cpu()
-        # f_loss += l_f.detach().data.cpu()
-        w_loss += l_w.detach().data.cpu()
+
+        sdr = cal_sdr(s, s_hat)
+        sdr_tt += sdr.detach().data.cpu()
 
         if debug:
             break
 
-    losses = {'val_l_t': t_loss/len(valid_loader), 'val_l_w': w_loss/len(valid_loader)}
+    losses = {'val_l_t': t_loss/len(valid_loader), 'sdr_tt': sdr_tt/len(valid_loader)}
 
     return losses
 
@@ -220,54 +232,58 @@ def get_args():
 if __name__ == '__main__':
         
     parser = argparse.ArgumentParser(description="Encodec_baseline")
-    parser.add_argument("--output_dir", type=str, default=os.getenv("AMLT_OUTPUT_DIR", "/tmp"))
-    parser.add_argument("--data_path", type=str, default=os.environ.get("AMLT_DATA_DIR", ".")+'/*')
+    parser.add_argument("--output_dir", type=str, default='/home/hy17/Projects/encodec/saved_models')
+    # parser.add_argument("--data_path", type=str, default=os.environ.get("AMLT_DATA_DIR", ".")+'/*')
+    parser.add_argument("--data_path", type=str, default='/data/hy17/dns_pth/*')
     # parser.add_argument("--data_path", type=str, defaulst='/home/v-haiciyang/data/haici/dns_pth/*')
     parser.add_argument("--disc_freq", type=int, default=1)
     parser.add_argument('--multi', dest='multi', action='store_true')
     parser.add_argument('--use_disc', dest='use_disc', action='store_true')
     parser.add_argument('--debug', dest='debug', action='store_true')
     parser.add_argument('--bandwidth', type=int, default=3)
+    parser.add_argument('--batch_size', type=int, default=8)
+    parser.add_argument('--exp_name', type=str, default='')
+    parser.add_argument('--finetune_model', type=str, default='')
     
     inp_args = parser.parse_args()
 
     args = get_args()
 
-    master_uri = "tcp://%s:%s" % (args.get("MASTER_ADDR"), args.get("MASTER_PORT"))
-    os.environ["NCCL_DEBUG"] = "WARN"
-    node_rank = args.get("NODE_RANK")
+    run_ddp = False if len(args) == 1 else True
+    if not inp_args.debug:
+        writer = SummaryWriter(f'runs/{inp_args.exp_name}')
 
-    gpus_per_node = torch.cuda.device_count()
-    world_size = args.get("WORLD_SIZE")
-    gpu_rank = args.get("LOCAL_RANK")
-    if inp_args.debug:
-        node_rank = 0
-    global_rank = node_rank * gpus_per_node + gpu_rank
-    dist.init_process_group(
-        backend="nccl", init_method=master_uri, world_size=world_size, rank=global_rank
-    )
+    if run_ddp:
+        master_uri = "tcp://%s:%s" % (args.get("MASTER_ADDR"), args.get("MASTER_PORT"))
+        os.environ["NCCL_DEBUG"] = "WARN"
+        node_rank = args.get("NODE_RANK")
 
-    data_path = inp_args.data_path if not inp_args.debug else '/home/v-haiciyang/data/haici/dns_pth/*'
+        gpus_per_node = torch.cuda.device_count()
+        world_size = args.get("WORLD_SIZE")
+        gpu_rank = args.get("LOCAL_RANK")
+        if inp_args.debug:
+            node_rank = 0
+        global_rank = node_rank * gpus_per_node + gpu_rank
+        dist.init_process_group(
+            backend="nccl", init_method=master_uri, world_size=world_size, rank=global_rank
+        )
 
     # synchronizes all the threads to reach this point before moving on
     # dist.barrier() 
 
-    train_dataset = EnCodec_data(data_path, task = 'train', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
-    valid_dataset = EnCodec_data(data_path, task = 'valid', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
-    train_sampler = DistributedSampler(dataset=train_dataset, shuffle=True) 
-    valid_sampler = DistributedSampler(dataset=valid_dataset, shuffle=True) 
-    train_loader = DataLoader(train_dataset, batch_size=8, sampler=train_sampler, pin_memory=True)
-    valid_loader = DataLoader(valid_dataset, batch_size=8, sampler=valid_sampler, pin_memory=True)
-
-    # for i in train_dataset:
-    #     pass
-    # print(train_dataset.max_seg)
-    # fake()
-    # # get pretrained model
-    # model = EncodecModel.encodec_model_24khz()
-
-    torch.manual_seed(global_rank)
-    torch.cuda.set_device(gpu_rank)
+    train_dataset = EnCodec_data(inp_args.data_path, task = 'train', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
+    valid_dataset = EnCodec_data(inp_args.data_path, task = 'valid', seq_len_p_sec = 1, sample_rate=16000, multi=inp_args.multi)
+    if run_ddp:
+        train_sampler = DistributedSampler(dataset=train_dataset, shuffle=True) 
+        valid_sampler = DistributedSampler(dataset=valid_dataset, shuffle=True) 
+        train_loader = DataLoader(train_dataset, batch_size=8, sampler=train_sampler, pin_memory=True)
+        valid_loader = DataLoader(valid_dataset, batch_size=8, sampler=valid_sampler, pin_memory=True)
+        torch.manual_seed(global_rank)
+        torch.cuda.set_device(gpu_rank)    
+    else:
+        train_loader = DataLoader(train_dataset, batch_size=inp_args.batch_size, pin_memory=True)
+        valid_loader = DataLoader(valid_dataset, batch_size=inp_args.batch_size, pin_memory=True)
+        gpu_rank = 0
     # get new model
     model = EncodecModel._get_model(
                    target_bandwidths = [1.5, 3, 6], 
@@ -281,25 +297,33 @@ if __name__ == '__main__':
     
     model.set_target_bandwidth(inp_args.bandwidth)
 
+    if inp_args.finetune_model:
+        state_dict = torch.load(inp_args.finetune_model)
+        model_dict = OrderedDict()
+        pattern = re.compile('module.')
+        for k,v in state_dict.items():
+            if re.search("module", k):
+                model_dict[re.sub(pattern, '', k)] = v
+            else:
+                model_dict = state_dict
+        model.load_state_dict(model_dict)
+
     disc = MSDisc(filters=32).cuda(gpu_rank)
 
     optimizer_G = optim.Adam(model.parameters(), lr=3e-4, betas=(0.5, 0.9))
     optimizer_D = optim.Adam(disc.parameters(), lr=3e-4, betas=(0.5, 0.9))
 
-    model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu_rank])    
-    disc = nn.parallel.DistributedDataParallel(disc, device_ids=[gpu_rank])
-
-    # for name, param in model.module.quantizer.named_parameters():
-    #     if param.requires_grad:
-    #         print(name)
-    # fake()
-
-    run = Run.get_context()
-
+    if run_ddp:
+        model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu_rank])    
+        disc = nn.parallel.DistributedDataParallel(disc, device_ids=[gpu_rank])
+        
+    loss = torch.tensor(float('-inf'))
     # ---- Train 2000 epochs
     for epoch in range(2000):
         
-        train_loader.sampler.set_epoch(epoch)
+        if run_ddp:
+            train_loader.sampler.set_epoch(epoch)
+
         tr_losses = train(model, disc, train_loader, inp_args.bandwidth, optimizer_G, 
         optimizer_D, gpu_rank, inp_args.use_disc, inp_args.disc_freq, inp_args.debug)
         with torch.no_grad():
@@ -307,18 +331,27 @@ if __name__ == '__main__':
 
         if gpu_rank == 0: # only save model and logs for the main process
 
-            for key, value in tr_losses.items():
-                run.log(key, value.item())
-            for key, value in val_losses.items():
-                run.log(key, value.item())
+            if inp_args.debug:
+                print(list(val_losses.values()))
+            else:
+                for key, value in tr_losses.items():
+                    writer.add_scalar('Train/'+key, value.item(), epoch)
+                for key, value in val_losses.items():
+                    writer.add_scalar('Valid/'+key, value.item(), epoch)
 
-            if (epoch+1)%100 == 0:
-                torch.save(model.state_dict(), inp_args.output_dir + "/epoch{}_model.amlt".format(str(epoch)))
+                writer.flush()
 
+                vall = list(val_losses.values())[-1] # sdr
+                if vall > loss:
+                    loss = vall
+                    # print(epoch, 'save_model')
+                    if not inp_args.debug:
+                        torch.save(model.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}.amlt')
+                        torch.save(disc.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}_disc.amlt')
     
     # Tear down the process group
-    dist.destroy_process_group()
-
+    # dist.destroy_process_group()
+# 
     
 
     
