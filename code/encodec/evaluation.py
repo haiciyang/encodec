@@ -101,7 +101,7 @@ if __name__ == '__main__':
             else:
                 model_dict = state_dict
         model.load_state_dict(model_dict)
-        fake()
+        # fake()
 
         model.set_target_bandwidth(inp_args.bandwidth)
 

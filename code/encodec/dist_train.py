@@ -297,8 +297,16 @@ if __name__ == '__main__':
     
     model.set_target_bandwidth(inp_args.bandwidth)
 
-    if finetune_model:
-        model.load_state_dict(torch.load(inp_args.finetune_model))
+    if inp_args.finetune_model:
+        state_dict = torch.load(inp_args.finetune_model)
+        model_dict = OrderedDict()
+        pattern = re.compile('module.')
+        for k,v in state_dict.items():
+            if re.search("module", k):
+                model_dict[re.sub(pattern, '', k)] = v
+            else:
+                model_dict = state_dict
+        model.load_state_dict(model_dict)
 
     disc = MSDisc(filters=32).cuda(gpu_rank)
 
