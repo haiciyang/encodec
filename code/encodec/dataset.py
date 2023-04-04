@@ -7,164 +7,84 @@ from scipy import signal
 from scipy.io import wavfile
 import torchaudio.transforms as T
 from torch.utils.data import Dataset, DataLoader
+import pandas as pd
+import random
 
-'''
 class EnCodec_data(Dataset):
 
-	def __init__(self, path, task='train', seq_len_p_sec=5, sample_rate=16000, multi=False): 
-
-		# generate 5s fragments
-		# self.path = '/home/v-haiciyang/data/haici/read_speech_16k/*'
-		# self.path = os.environ.get("AMLT_DATA_DIR", ".") + 'read_speech_16k/*'
-		self.path = path
-		self.spks_l = glob.glob(self.path)
-		self.task = task
-		self.seq_len_p_sec = seq_len_p_sec
-		self.sample_rate = sample_rate
-		self.multi = multi
-		self.max_seg = 0
+	def __init__(self, ds_path, csv_path, task='train', mixture=False): 
+		self.ds_path = ds_path
+		self.df = pd.read_csv(csv_path)
+		self.df_part = self.df[self.df['part']==task]
+		self.mixture = mixture
+		self.mixture_data = ['/data/common/musan/noise/free-sound', '/data/common/musan/noise/sound-bible']
 
 	def __len__(self):
-
-		return len(self.spks_l)
+		return len(self.df_part)
 
 
 	def __getitem__(self, idx):
-
-		if self.multi:
-
-			seq1 = self.get_seq(idx)
-			if self.task =='train':
-				idxr = torch.randint(self.__len__(), (1,))
-			else:
-				idxr = (idx + 20) % self.__len__()
-
-			seqr = self.get_seq(idxr)
-
-			output = seq1 + seqr
-
-		else:
-
-			output = self.get_seq(idx)
-		
-		if self.sample_rate != 16000:
-			output = output.squeeze().data.numpy() # (80000)
-			output = signal.resample(output, self.sample_rate*self.seq_len_p_sec)
-			output = torch.tensor(output).unsqueeze(0)
-		
+		output = self.get_seq(idx)
 		return output
 
+	def sample_noise(self):
+		dir_idx = random.randint(0, len(self.mixture_data)-1)
+		noise_dir = self.mixture_data[dir_idx]
+		noise_files = os.listdir(noise_dir)
+		file_idx = random.randint(0, len(noise_files)-1)
+		_, noise = wavfile.read(f"{noise_dir}/{noise_files[file_idx]}")
+		return noise
 
-	def get_seq(self, idx):
+	def pad_noise(self, speech, noise):
+		'''
+		Cuts noise vector if speech vec is shorter
+		Adds noise if speech vector is longer
+		'''
+		noise_len = noise.shape[1]
+		speech_len = speech.shape[1]
 
-		length = len(self.spks_l)
-		spk_folder = self.spks_l[idx]
+		if speech_len > noise_len:
+			repeat = (speech_len//noise_len) +1
+			noise = torch.tile(noise, (1, repeat))
+			diff = speech_len - noise.shape[1]
+			noise = noise[:, :noise.shape[1]+diff]          
+				
+		elif speech_len < noise_len:
+			noise = noise[:,:speech_len]
+		return noise
 
-		seg_l = glob.glob(spk_folder + '/*.pth') # Leave the rest for eval and test
+	def mix_signals(self, speech, noise, desired_snr):   
+		#calculate energies
+		energy_s = torch.sum(speech**2, dim=-1, keepdim=True)
+		energy_n = torch.sum(noise**2, dim=-1, keepdim=True)
 
-		len_seg = len(seg_l)
-		valid_num = len_seg//10 + 1
-		train_num = len_seg - valid_num
+		b = torch.sqrt((energy_s / energy_n) * (10 ** (-desired_snr / 10.)))
+		return speech + b * noise
 
+
+	def get_seq(self, idx, seg_len=5):
+		row = self.df_part.iloc[idx]
+		fname = row['file']
+		fp = f'{self.ds_path}/{fname}'
 		
-		if self.task == 'train':
-			seg_id = torch.randint(train_num, (1,))
-		elif self.task == 'valid':
-			seg_id = torch.randint(valid_num, (1,))
-			seg_id = - (seg_id + 1) # -1 or -2
-		elif self.task == 'eval':
-			seg_id = -2
-		else:
-			print('Task can only be train or valid.')
+		fs, wav = wavfile.read(fp)
 
-		seg = torch.load(seg_l[seg_id])
+		st_idx = row['seg']
+		end_idx = st_idx + seg_len*fs
+		seg = wav[st_idx:end_idx]
 
 		# Normalize and add random gain
 		seg = seg / (np.std(seg) + 1e-20)
-		# self.max_seg = max(max(seg), self.max_seg)
-		# seg /= np.max(seg)
 		
 		gain = np.random.randint(-10, 7, (1,))
 		scale = np.power(10, gain/20)
 		seg *= scale
-
-
-		return seg
-'''
-
-class EnCodec_data(Dataset):
-
-	def __init__(self, path, task='train', seq_len_p_sec=5, sample_rate=16000, multi=False): 
-
-		# generate 5s fragments
-		# self.path = '/home/v-haiciyang/data/haici/read_speech_16k/*'
-		# self.path = os.environ.get("AMLT_DATA_DIR", ".") + 'read_speech_16k/*'
-		self.path = path
-		self.spks_l = glob.glob(self.path)
-		self.task = task
-		self.seq_len_p_sec = seq_len_p_sec
-		self.sample_rate = sample_rate
-		self.multi = multi
-		self.max_seg = 0
-
-	def __len__(self):
-
-		return len(self.spks_l)
-
-
-	def __getitem__(self, idx):
-
-		if self.multi:
-
-			seq1 = self.get_seq(idx)
-			if self.task =='train':
-				idxr = torch.randint(self.__len__(), (1,))
-			else:
-				idxr = (idx + 20) % self.__len__()
-
-			seqr = self.get_seq(idxr)
-
-			output = seq1 + seqr
-
+		seg = seg.reshape(1, -1)
+		if self.mixture:
+			noise = self.sample_noise()
+			noise = self.pad_mode(seg, noise)
+			snr = random.randint(-5, 5)
+			x = self.mix_signals(seg, noise, snr)
 		else:
-
-			output = self.get_seq(idx)
-
-		return output
-
-
-	def get_seq(self, idx):
-
-		length = len(self.spks_l)
-		spk_folder = self.spks_l[idx]
-
-		seg_l = glob.glob(spk_folder + '/*.pth') # Leave the rest for eval and test
-
-		len_seg = len(seg_l)
-		valid_num = len_seg//10 + 1
-		train_num = len_seg - valid_num
-
-		
-		if self.task == 'train':
-			seg_id = torch.randint(train_num, (1,))
-		elif self.task == 'valid':
-			seg_id = torch.randint(valid_num, (1,))
-			seg_id = - (seg_id + 1) # -1 or -2
-		elif self.task == 'eval':
-			seg_id = -2
-		else:
-			print('Task can only be train or valid.')
-
-		seg = torch.load(seg_l[seg_id])
-
-		# Normalize and add random gain
-		seg = seg / (np.std(seg) + 1e-20)
-		# self.max_seg = max(max(seg), self.max_seg)
-		# seg /= np.max(seg)
-		
-		gain = np.random.randint(-10, 7, (1,))
-		scale = np.power(10, gain/20)
-		seg *= scale
-
-
-		return seg
+			x_seg = seg
+		return seg, x_seg

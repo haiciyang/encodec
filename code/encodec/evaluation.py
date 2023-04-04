@@ -22,10 +22,12 @@ from torch.distributions.normal import Normal
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.distributed import DistributedSampler
 
-from .dataset_stable import EnCodec_data
+from .dataset import EnCodec_data
 from .model import EncodecModel
 from .msstftd import MultiScaleSTFTDiscriminator as MSDisc
 from .balancer import Balancer
+from .dist_train import entropy_rate, freeze_params, load_config
+import sys
 
 
 def melspec_loss(s, s_hat, gpu_rank, n_freq):
@@ -52,28 +54,20 @@ def melspec_loss(s, s_hat, gpu_rank, n_freq):
 
 if __name__ == '__main__':
 
-        
-    parser = argparse.ArgumentParser(description="Encodec_baseline")
-    parser.add_argument("--data_path", type=str, default='/data/hy17/dns_pth/*')
-    parser.add_argument("--model_path", type=str, default='/home/hy17/Projects/encodec/saved_models/multi_encodec_3.amlt')
-    parser.add_argument("--note2", type=str, default='')
-    parser.add_argument('--multi', dest='multi', action='store_true')
-    parser.add_argument('--sr', type=int, default=16000)
-    parser.add_argument('--bandwidth', type=float, default=3.0)
-
-    
-    inp_args = parser.parse_args()
+    inp_args = load_config(sys.argv[1])
 
     # args = get_args()
 
     # synchronizes all the threads to reach this point before moving on
     # dist.barrier() 
 
+    torch.manual_seed(0)
+
     # train_dataset = EnCodec_data(inp_args.data_path, task = 'train', seq_len_p_sec = 5, sample_rate=16000, multi=inp_args.multi)
     # valid_dataset = EnCodec_data(inp_args.data_path, task = 'eval', seq_len_p_sec = 5, sample_rate=16000, multi=inp_args.multi)
-    valid_dataset = EnCodec_data(inp_args.data_path, task = 'valid', seq_len_p_sec = 5, sample_rate=16000, multi=inp_args.multi, n_spks = 100)
+    valid_dataset = EnCodec_data(inp_args.data_path, inp_args.csv_path, task = 'test')
     # train_loader = DataLoader(train_dataset, batch_size=8, sampler=train_sampler, pin_memory=True)
-    valid_loader = DataLoader(valid_dataset, batch_size=1, pin_memory=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=1, pin_memory=True, shuffle=True)
 
     # # get pretrained model
     if inp_args.sr == 24000:
@@ -106,12 +100,18 @@ if __name__ == '__main__':
         model.set_target_bandwidth(inp_args.bandwidth)
 
 
+    which = 'decoder' if inp_args.freeze_dec else 'encoder'
+
+    freeze_params(model, which)
     model.eval()
     idx = 0
-    note1 = 'multi' if inp_args.multi else 'single'
-    note2 = inp_args.note2
+    #note1 = 'multi' if inp_args.multi else 'single'
+    #note2 = inp_args.note2
+    num_inference=5
     # for s in valid_loader:
+    '''
     for idx, batch in enumerate(valid_loader):
+        print(f"[Idx] : {idx}/{len(valid_loader)}")
         
         s = batch[0]
         
@@ -129,6 +129,8 @@ if __name__ == '__main__':
         quantizedResult = model.quantizer(emb, sample_rate=16000) 
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
+        e_rate = entropy_rate(qtz_emb)
+        print(e_rate)
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # plt.plot(s_hat.squeeze().cpu().data.numpy())
@@ -142,12 +144,9 @@ if __name__ == '__main__':
             s_hat = s_hat.squeeze().cpu().data.numpy()
 
         s = s.squeeze().cpu().data.numpy()
-        wavfile.write(f"eval_wavs/s_{idx}_{note1}.wav", 16000, s/max(abs(s)))
-        wavfile.write(f"eval_wavs/sh_{idx}_{note1}_{note2}.wav", 16000, s_hat/max(abs(s_hat)))
+        wavfile.write(f"{inp_args.output}/s_{idx}_{note1}.wav", 16000, s/max(abs(s)))
+        wavfile.write(f"{inp_args.output}/sh_{idx}_{note1}_{note2}.wav", 16000, s_hat/max(abs(s_hat)))
 
-        if inp_args.multi:
+        if num_inference and idx==num_inference:
             break
-        if not inp_args.multi and idx == 1:
-            break
-        
-        
+'''

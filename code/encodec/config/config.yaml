@@ -1,0 +1,22 @@
+#Data params
+output_dir: "/home/anakuzne/exp/encodec_04_2023/saved_models"
+data_path: "/data/common"
+csv_path: "/home/anakuzne/utils/csvs/encodec_ds.csv"
+mixture: True
+exp_name: "ft_freeze_decoder_bw_3_se"
+finetune_model: "/home/anakuzne/projects/encodec_hy/encodec/ckpt/epoch1999_model.amlt"
+model_path: "/home/anakuzne/projects/encodec_hy/encodec/ckpt/epoch1999_model.amlt"
+
+#Training params
+use_disc: True
+disc_freq: 1
+bandwidth: 3
+batch_size: 8
+freeze_enc: False
+freeze_dec: True
+sr: 16000
+
+use_se_loss: True
+lr_gen: 3e-5
+lr_disc: 3e-5
+debug: True
