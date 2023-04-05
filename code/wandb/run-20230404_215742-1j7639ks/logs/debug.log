@@ -1,0 +1,26 @@
+2023-04-04 21:57:42,938 INFO    MainThread:3844418 [wandb_setup.py:_flush():76] Configure stats pid to 3844418
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_setup.py:_flush():76] Loading settings from /home/anakuzne/.config/wandb/settings
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_setup.py:_flush():76] Loading settings from /home/anakuzne/projects/encodec_hy/encodec/code/wandb/settings
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-04-04 21:57:42,939 WARNING MainThread:3844418 [wandb_setup.py:_flush():76] Could not find program at -m encodec.dist_train
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': None, 'program': '-m encodec.dist_train'}
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_init.py:_log_setup():506] Logging user logs to /home/anakuzne/projects/encodec_hy/encodec/code/wandb/run-20230404_215742-1j7639ks/logs/debug.log
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_init.py:_log_setup():507] Logging internal logs to /home/anakuzne/projects/encodec_hy/encodec/code/wandb/run-20230404_215742-1j7639ks/logs/debug-internal.log
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_init.py:init():546] calling init triggers
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_init.py:init():552] wandb.init called with sweep_config: {}
+config: {'output_dir': '/home/anakuzne/exp/encodec_04_2023/saved_models', 'data_path': '/data/common', 'csv_path': '/home/anakuzne/utils/csvs/encodec_ds.csv', 'mixture': False, 'exp_name': 'encodec_ft_base_bw3_no_se', 'finetune_model': '/home/anakuzne/projects/encodec_hy/encodec/ckpt/epoch1999_model.amlt', 'use_disc': True, 'disc_freq': 1, 'bandwidth': 3, 'batch_size': 8, 'freeze_enc': False, 'freeze_dec': False, 'sr': 16000, 'use_se_loss': False, 'lr_gen': '3e-5', 'lr_disc': '3e-5', 'debug': False}
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_init.py:init():602] starting backend
+2023-04-04 21:57:42,939 INFO    MainThread:3844418 [wandb_init.py:init():606] setting up manager
+2023-04-04 21:57:42,942 INFO    MainThread:3844418 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-04-04 21:57:42,945 INFO    MainThread:3844418 [wandb_init.py:init():613] backend started and connected
+2023-04-04 21:57:42,959 INFO    MainThread:3844418 [wandb_init.py:init():701] updated telemetry
+2023-04-04 21:57:42,965 INFO    MainThread:3844418 [wandb_init.py:init():741] communicating run to backend with 60.0 second timeout
+2023-04-04 21:57:43,194 INFO    MainThread:3844418 [wandb_run.py:_on_init():2133] communicating current version
+2023-04-04 21:57:43,272 INFO    MainThread:3844418 [wandb_run.py:_on_init():2142] got version response 
+2023-04-04 21:57:43,273 INFO    MainThread:3844418 [wandb_init.py:init():789] starting run threads in backend
+2023-04-04 21:57:46,567 INFO    MainThread:3844418 [wandb_run.py:_console_start():2114] atexit reg
+2023-04-04 21:57:46,567 INFO    MainThread:3844418 [wandb_run.py:_redirect():1969] redirect: 3
+2023-04-04 21:57:46,567 INFO    MainThread:3844418 [wandb_run.py:_redirect():2034] Wrapping output streams.
+2023-04-04 21:57:46,568 INFO    MainThread:3844418 [wandb_run.py:_redirect():2059] Redirects installed.
+2023-04-04 21:57:46,568 INFO    MainThread:3844418 [wandb_init.py:init():831] run started, returning control to user process

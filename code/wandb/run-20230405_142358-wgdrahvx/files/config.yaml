@@ -1,0 +1,79 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.14.0
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.11.2
+    start_time: 1680719038.666576
+    t:
+      1:
+      - 1
+      - 55
+      2:
+      - 1
+      - 55
+      3:
+      - 2
+      - 16
+      - 17
+      - 23
+      - 37
+      4: 3.11.2
+      5: 0.14.0
+      8:
+      - 5
+bandwidth:
+  desc: null
+  value: 3
+batch_size:
+  desc: null
+  value: 8
+csv_path:
+  desc: null
+  value: /home/anakuzne/utils/csvs/encodec_ds.csv
+data_path:
+  desc: null
+  value: /data/common
+debug:
+  desc: null
+  value: false
+disc_freq:
+  desc: null
+  value: 1
+exp_name:
+  desc: null
+  value: encodec_ft_base_bw3_no_se
+finetune_model:
+  desc: null
+  value: /home/anakuzne/projects/encodec_hy/encodec/ckpt/epoch1999_model.amlt
+freeze_dec:
+  desc: null
+  value: false
+freeze_enc:
+  desc: null
+  value: false
+lr_disc:
+  desc: null
+  value: 3e-5
+lr_gen:
+  desc: null
+  value: 3e-5
+mixture:
+  desc: null
+  value: false
+output_dir:
+  desc: null
+  value: /home/anakuzne/exp/encodec_04_2023/saved_models
+sr:
+  desc: null
+  value: 16000
+use_disc:
+  desc: null
+  value: true
+use_se_loss:
+  desc: null
+  value: false

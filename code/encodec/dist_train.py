@@ -49,11 +49,11 @@ class ParamDict(dict):
 def load_config(cfg_path):
     with open(cfg_path) as file:
         try:
-            config = yaml.safe_load(file)   
+            config_dict = yaml.safe_load(file)   
         except yaml.YAMLError as exc:
             print(exc)
-    config = ParamDict(config)
-    return config
+    config = ParamDict(config_dict)
+    return config, config_dict
 
 def cal_sdr(s, s_hat):
 
@@ -78,8 +78,8 @@ def entropy_rate(emb):
     batch_rate = 0
     for b in emb:
         code_count = {}
-        #b = [C, T]
-        for c in b:
+        for t in range(b.shape[-1]):
+            c = b[:,t]
             if c not in code_count:
                 code_count[c] = 1
             else:
@@ -118,10 +118,17 @@ def freeze_params(model, param_name):
         if param_name in name:
             param.requires_grad = False
 
-def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_rank, use_disc, disc_freq, use_se_loss, debug):
+def train(model, disc, train_loader, valid_loader,
+         bandwidth, optimizer_G, optimizer_D, 
+         gpu_rank, use_disc, disc_freq, use_se_loss, debug, 
+         output_dir, exp_name):
 
     # ---------- Run model ------------
-    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, = 0,0,0,0,0,0
+    loss = torch.tensor(float('-inf'))
+    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, ep_entropy = 0,0,0,0,0,0,0
+
+    steps = 0
+    num_steps = 500
 
     model.train()
     for idx, batch in enumerate(train_loader):
@@ -139,6 +146,8 @@ def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_ra
         quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
+        batch_entropy = entropy_rate(qtz_emb)
+        ep_entropy+=batch_entropy.data
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # --- Update Generator ---
@@ -146,7 +155,6 @@ def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_ra
 
          # ---- VQ Commitment loss l_w -----
         l_w = quantizedResult.penalty # commitment loss
-
         l_t = torch.mean(torch.abs(s - s_hat))
         l_f = melspec_loss(s, s_hat, gpu_rank, range(5,12))
 
@@ -180,11 +188,10 @@ def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_ra
             feat_loss += l_feat.detach().data.cpu()
 
             l_w.backward(retain_graph=True)
-            
-            
             losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
             balancer = Balancer(weights={'l_t': 0.1, 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
             balancer.backward(losses, s_hat)
+
 
             # loss = 0.1 * l_t + l_f + 3 * l_g + 3 * l_feat + l_w
             # loss.backward()
@@ -207,31 +214,55 @@ def train(model, disc, train_loader, bandwidth, optimizer_G, optimizer_D, gpu_ra
 
                 d_loss += l_d.detach().data.cpu()
 
-            # dist.barrier()
-            losses = {'l_g': g_loss/len(train_loader), 
-                      'l_d': d_loss/len(train_loader)*disc_freq, 
-                      'l_t': t_loss/len(train_loader), 
-                      'l_f': f_loss/len(train_loader), 
-                      'l_w': w_loss/len(train_loader), 
-                      'l_feat': feat_loss/len(train_loader)}
+            else:
+                loss = 0.1 * l_t + l_f + l_w
+                loss.backward()
+                optimizer_G.step()
+                # dist.barrier()
+            
+            #Log losses for wandb
+        if steps%num_steps==0:
+            log_losses = {'l_g': g_loss/steps, 
+                    'l_d': d_loss/steps, 
+                    'l_t': t_loss/steps, 
+                    'l_f': f_loss/steps, 
+                    'l_w': w_loss/steps, 
+                    'l_feat': feat_loss/steps,
+                    'tr_entropy':ep_entropy/steps}
 
-        else:
-            loss = 0.1 * l_t + l_f + l_w
-            loss.backward()
-            optimizer_G.step()
-            # dist.barrier()
+            wandb.log(log_losses)
 
-            losses = {'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader)}
+            model.eval()
+            with torch.no_grad():
+                val_losses = valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug)
+                wandb.log(val_losses)
+                vall = list(val_losses.values())[-1] # sdr
+                if vall > loss:
+                    loss = vall
+                    if not inp_args.debug:
+                        torch.save(model.state_dict(), f'{output_dir}/{exp_name}.amlt')
+                        torch.save(disc.state_dict(), f'{output_dir}/{exp_name}_disc.amlt')
+            model.train()
+        steps+=1
+
+
         if debug:
             break
-    return losses
+    if use_disc:
+        losses = {'l_g': g_loss/len(train_loader), 
+                        'l_d': d_loss/len(train_loader)*disc_freq, 
+                        'l_t': t_loss/len(train_loader), 
+                        'l_f': f_loss/len(train_loader), 
+                        'l_w': w_loss/len(train_loader), 
+                        'l_feat': feat_loss/len(train_loader)}
+    else:
+        losses = {'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader)}
 
 
 def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
 
     # ---------- Run model ------------
-    t_loss, sdr_tt = 0, 0
-    
+    t_loss, sdr_tt, val_entropy = 0, 0, 0
     model.eval()
 
     for batch in valid_loader:
@@ -248,6 +279,8 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
         quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
+        batch_entropy = entropy_rate(qtz_emb)
+        val_entropy+=batch_entropy
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # ------ Reconstruction loss l_t, l_f --------
@@ -260,8 +293,7 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
         if debug:
             break
 
-    losses = {'val_l_t': t_loss/len(valid_loader), 'sdr_tt': sdr_tt/len(valid_loader)}
-
+    losses = {'val_l_t': t_loss/len(valid_loader), 'sdr_tt': sdr_tt/len(valid_loader), 'val_entropy':val_entropy/len(valid_loader)}
     return losses
 
 
@@ -301,7 +333,7 @@ def get_args():
 
 if __name__ == '__main__':
     config = sys.argv[1]
-    inp_args = load_config(config)
+    inp_args, config_dict = load_config(config)
 
     args = get_args()
 
@@ -380,51 +412,24 @@ if __name__ == '__main__':
         model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu_rank])    
         disc = nn.parallel.DistributedDataParallel(disc, device_ids=[gpu_rank])
     
-    if not inp_args.debug:
-        run_name = f"encodec_{inp_args.exp_name}_lr{inp_args.lr_gen}"
-        wandb.init(config=inp_args, project='encodec-se', entity='anakuzne')
-        wandb.run.name = run_name
+
+    if inp_args.freeze_enc or inp_args.freeze_dec:
+        which = 'decoder' if inp_args.freeze_dec else 'encoder'
+        freeze_params(model, which)
         
     loss = torch.tensor(float('-inf'))
-    # ---- Train 2000 epochs
-    for epoch in range(2000):
-        
-        if run_ddp:
-            train_loader.sampler.set_epoch(epoch)
+    # ---- Train 2000 epochs]
+    if not inp_args.debug:
+        run_name = f"encodec_{inp_args.exp_name}_lr{inp_args.lr_gen}"
+        with wandb.init(config=config_dict, project='encodec-se', entity='anakuzne'):
+            wandb.run.name = run_name
+            for epoch in range(2000):
+                if run_ddp:
+                    train_loader.sampler.set_epoch(epoch)
 
-        tr_losses = train(model, disc, train_loader, inp_args.bandwidth, optimizer_G, 
-            optimizer_D, gpu_rank, inp_args.use_disc, inp_args.disc_freq, inp_args.use_se_loss, inp_args.debug)
-
-        wandb.log(tr_losses)
-        
-        with torch.no_grad():
-            val_losses = valid(model, valid_loader, inp_args.bandwidth, gpu_rank, inp_args.use_se_loss, inp_args.debug)
-            wandb.log(val_losses)
-            print(f"{epoch} [Train:] {tr_losses}")
-            print(f"{epoch} [Valid:] {val_losses}")
-
-        if gpu_rank == 0: # only save model and logs for the main process
-
-            if inp_args.debug:
-                print(list(val_losses.values()))
-            else:
-                #for key, value in tr_losses.items():
-                #    writer.add_scalar('Train/'+key, value.item(), epoch)
-                #for key, value in val_losses.items():
-                #    writer.add_scalar('Valid/'+key, value.item(), epoch)
-
-                #writer.flush()
-
-                vall = list(val_losses.values())[-1] # sdr
-                if vall > loss:
-                    loss = vall
-                    # print(epoch, 'save_model')
-                    if not inp_args.debug:
-                        torch.save(model.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}.amlt')
-                        torch.save(disc.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}_disc.amlt')
-    
-    # Tear down the process group
-    # dist.destroy_process_group()
+                tr_losses = train(model, disc, train_loader, valid_loader, inp_args.bandwidth, optimizer_G, 
+                    optimizer_D, gpu_rank, inp_args.use_disc, inp_args.disc_freq, inp_args.use_se_loss, inp_args.debug, inp_args.output_dir, inp_args.exp_name)
+                print(f"Ep: {epoch} | Train loss: {tr_losses}")
 # 
     
 

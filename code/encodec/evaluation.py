@@ -99,17 +99,13 @@ if __name__ == '__main__':
 
         model.set_target_bandwidth(inp_args.bandwidth)
 
-
-    which = 'decoder' if inp_args.freeze_dec else 'encoder'
-
-    freeze_params(model, which)
     model.eval()
     idx = 0
     #note1 = 'multi' if inp_args.multi else 'single'
     #note2 = inp_args.note2
     num_inference=5
     # for s in valid_loader:
-    '''
+
     for idx, batch in enumerate(valid_loader):
         print(f"[Idx] : {idx}/{len(valid_loader)}")
         
@@ -117,7 +113,7 @@ if __name__ == '__main__':
         
         # s shape (64, 1, 16000)
         
-        s = s.unsqueeze(1).to(torch.float).cuda()
+        s = s.to(torch.float).cuda()
 
         # s /= torch.max(torch.abs(s))
 
@@ -144,9 +140,8 @@ if __name__ == '__main__':
             s_hat = s_hat.squeeze().cpu().data.numpy()
 
         s = s.squeeze().cpu().data.numpy()
-        wavfile.write(f"{inp_args.output}/s_{idx}_{note1}.wav", 16000, s/max(abs(s)))
-        wavfile.write(f"{inp_args.output}/sh_{idx}_{note1}_{note2}.wav", 16000, s_hat/max(abs(s_hat)))
+        #wavfile.write(f"{inp_args.output}/s_{idx}_{note1}.wav", 16000, s/max(abs(s)))
+        #wavfile.write(f"{inp_args.output}/sh_{idx}_{note1}_{note2}.wav", 16000, s_hat/max(abs(s_hat)))
 
         if num_inference and idx==num_inference:
             break
-'''
