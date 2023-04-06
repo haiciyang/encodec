@@ -1,0 +1,234 @@
+{
+    "os": "Linux-5.15.0-58-generic-x86_64-with-glibc2.31",
+    "python": "3.11.2",
+    "heartbeatAt": "2023-04-05T18:36:28.041509",
+    "startedAt": "2023-04-05T18:36:27.610448",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "encodec/config/config_base.yaml"
+    ],
+    "state": "running",
+    "program": "-m encodec.dist_train",
+    "git": {
+        "remote": "https://github.com/haiciyang/encodec.git",
+        "commit": "0cb6ec4d72380ba0e995f75afa85c36b90cdc6b9"
+    },
+    "email": "menina.indigena.17@gmail.com",
+    "root": "/home/anakuzne/projects/encodec_hy/encodec",
+    "host": "transformer",
+    "username": "anakuzne",
+    "executable": "/home/anakuzne/miniconda3/envs/encodec/bin/python",
+    "cpu_count": 32,
+    "cpu_count_logical": 32,
+    "cpu_freq": {
+        "current": 2892.4894375,
+        "min": 1500.0,
+        "max": 3000.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3294.493,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 1500.0,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3268.102,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3000.0,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3296.737,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3000.0,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3296.799,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3296.694,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3295.13,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3295.004,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 1500.0,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3298.555,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3296.774,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3296.579,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 2073.992,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3297.226,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3297.236,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 1500.0,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3297.297,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3297.318,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 1500.0,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3294.959,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3299.555,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3299.39,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 1465.873,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3297.747,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3295.855,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 1500.0,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3294.37,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3294.291,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3296.85,
+            "min": 1500.0,
+            "max": 3000.0
+        },
+        {
+            "current": 3297.155,
+            "min": 1500.0,
+            "max": 3000.0
+        }
+    ],
+    "disk": {
+        "total": 3519.746925354004,
+        "used": 2728.4775733947754
+    },
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "gpu_count": 8,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        },
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        }
+    ],
+    "memory": {
+        "total": 251.76268005371094
+    }
+}

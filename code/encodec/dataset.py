@@ -12,11 +12,12 @@ import random
 
 class EnCodec_data(Dataset):
 
-	def __init__(self, ds_path, csv_path, task='train', mixture=False): 
+	def __init__(self, ds_path, csv_path, task='train', mixture=False, standardize=True): 
 		self.ds_path = ds_path
 		self.df = pd.read_csv(csv_path)
 		self.df_part = self.df[self.df['part']==task]
 		self.mixture = mixture
+		self.standardize = standardize
 		self.mixture_data = ['/data/common/musan/noise/free-sound', '/data/common/musan/noise/sound-bible']
 
 	def __len__(self):
@@ -73,13 +74,15 @@ class EnCodec_data(Dataset):
 		end_idx = st_idx + seg_len*fs
 		seg = wav[st_idx:end_idx]
 
-		# Normalize and add random gain
-		seg = seg / (np.std(seg) + 1e-20)
-		
-		gain = np.random.randint(-10, 7, (1,))
-		scale = np.power(10, gain/20)
-		seg *= scale
+		if self.standardize:
+			# Normalize and add random gain
+			seg = seg / (np.std(seg) + 1e-20)
+			
+			gain = np.random.randint(-10, 7, (1,))
+			scale = np.power(10, gain/20)
+			seg *= scale
 		seg = seg.reshape(1, -1)
+		
 		if self.mixture:
 			noise = self.sample_noise()
 			noise = self.pad_mode(seg, noise)

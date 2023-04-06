@@ -2,21 +2,23 @@
 output_dir: "/home/anakuzne/exp/encodec_04_2023/saved_models"
 data_path: "/data/common"
 csv_path: "/home/anakuzne/utils/csvs/encodec_ds.csv"
-mixture: False
-exp_name: "encodec_ft_base_bw3_no_se"
+mixture: True
+standardize: False
+exp_name: "encodec_ft_bw1_5_se"
 finetune_model: "/home/anakuzne/projects/encodec_hy/encodec/ckpt/epoch1999_model.amlt"
+finetune_disc: "/path/"
 #model_path: "/home/anakuzne/projects/encodec_hy/encodec/ckpt/epoch1999_model.amlt"
 
 #Training params
 use_disc: True
 disc_freq: 1
-bandwidth: 3
+bandwidth: 1.5
 batch_size: 8
 freeze_enc: False
-freeze_dec: False
+freeze_dec: True
 sr: 16000
 
-use_se_loss: False
+use_se_loss: True
 lr_gen: 3e-5
 lr_disc: 3e-5
 debug: False
