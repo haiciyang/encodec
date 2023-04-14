@@ -6,55 +6,62 @@ import numpy as np
 from mir_eval.separation import bss_eval_sources
 import argparse
 from tqdm import tqdm
+import torch
 
-def metrics(input_path, fs=16000):
-    files = os.listdir(input_path)
-    pairs = []
-    
-    for i in range(len(files)//2):
-        s = f"{input_path}/s_{i}_single.wav"
-        sh = f"{input_path}/sh_{i}_single_.wav"
-        pairs.append((s, sh))
+
+def cal_sdr(s, s_hat):
+
+    if len(s.shape) == 3:
+        B, C, L = s.shape
+        s = s.reshape(B*C, L)
+    if len(s_hat.shape) == 3:
+        B, C, L = s_hat.shape
+        s_hat = s_hat.reshape(B*C, L)
+
+     # s, s_hat - (bt, L)
+    return torch.mean(
+        -10 * torch.log10(
+        torch.sum((s - s_hat)**2, -1) / torch.sum(s**2, -1))
+    )
+
+
+
+
+def metrics(data_path, csv_path, output_path, task, fs=16000):
+    valid_dataset = EnCodec_data(ds_path=idata_path, csv_path=icsv_path, task = task,  mixture=True, standardize=True)
 
     SDR = 0
     PESQ = 0
     STOI = 0
 
-    SDR_ref = 0
-    PESQ_ref = 0
-    STOI_ref = 0
-
-    for p in tqdm(pairs):
-        s, sh = p
-        _, s = wavfile.read(s)
-        _, sh = wavfile.read(sh)
-        sdr, _, _, _ = bss_eval_sources(s, sh)
-        SDR+=sdr
+    skipped = 0
+    
+        try:
+            PESQ += pesq(fs, s, sh, 'wb')
+        except:
+            skipped+=1
+            continue
         STOI += stoi(s, sh, fs, True)
-        PESQ += pesq(fs, s, sh, 'wb')
-
-        sdr, _, _, _ = bss_eval_sources(s, s)
-        SDR_ref+= sdr
-        STOI_ref+= stoi(s, s, fs, True)
-        PESQ_ref+= pesq(fs, s, s, 'wb')
-
-    SDR/=len(pairs)
-    PESQ/=len(pairs)
-    STOI/=len(pairs)
-
-    SDR_ref/=len(pairs)
-    STOI_ref/=len(pairs)
-    PESQ_ref/=len(pairs)
-
-    print(f"[SDRref]: {SDR_ref} [ePESQref]: {PESQ_ref} [eSTOIref]: {STOI_ref}")
-    print(f"[SDR]: {SDR} [ePESQ]: {PESQ} [eSTOI]: {STOI}")
+        s = torch.tensor(s).unsqueeze(0)
+        sh = torch.tensor(sh).unsqueeze(0)
+        #print(s.shape, sh.shape)
+        sdr = cal_sdr(s, sh)
+        SDR+=sdr.data
+    SDR/=(len(pairs)-skipped)
+    PESQ/=(len(pairs)-skipped)
+    STOI/=(len(pairs)-skipped)
+    print(f'Skipped {skipped}/{len(pairs)}')
+    print(f"[SDR]: {SDR:0.4f} [ePESQ]: {PESQ:0.4f} [eSTOI]: {STOI:0.4f}")
     
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Encodec_baseline")
-    parser.add_argument("--data_path", type=str, default='/home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs')
+    parser.add_argument('--data_path', type=str, default="/data/common")
+    parser.add_argument("--csv_path", type=str, default="/home/anakuzne/utils/csvs/encodec_ds.csv")
+    parser.add_argument("--output_path", type=str, default='/home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs')
+    parser.add_argument("--task", type=str, default='val')
     inp_args = parser.parse_args()
     
-    metrics(inp_args.data_path)
+    metrics(inp_args.csv_path, inp_args.output_path, inp_args.task)
 

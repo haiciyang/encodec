@@ -28,6 +28,9 @@ from .msstftd import MultiScaleSTFTDiscriminator as MSDisc
 from .balancer import Balancer
 from .dist_train import entropy_rate, freeze_params, load_config
 import sys
+from .dist_train import cal_sdr
+from pystoi import stoi
+from pesq import pesq
 
 
 def melspec_loss(s, s_hat, gpu_rank, n_freq):
@@ -54,7 +57,7 @@ def melspec_loss(s, s_hat, gpu_rank, n_freq):
 
 if __name__ == '__main__':
 
-    inp_args = load_config(sys.argv[1])
+    inp_args, args_dict = load_config(sys.argv[1])
 
     # args = get_args()
 
@@ -65,7 +68,7 @@ if __name__ == '__main__':
 
     # train_dataset = EnCodec_data(inp_args.data_path, task = 'train', seq_len_p_sec = 5, sample_rate=16000, multi=inp_args.multi)
     # valid_dataset = EnCodec_data(inp_args.data_path, task = 'eval', seq_len_p_sec = 5, sample_rate=16000, multi=inp_args.multi)
-    valid_dataset = EnCodec_data(inp_args.data_path, inp_args.csv_path, task = 'test')
+    valid_dataset = EnCodec_data(inp_args.data_path, inp_args.csv_path, task = 'test', mixture=inp_args.mixture, standardize=inp_args.standardize)
     # train_loader = DataLoader(train_dataset, batch_size=8, sampler=train_sampler, pin_memory=True)
     valid_loader = DataLoader(valid_dataset, batch_size=1, pin_memory=True, shuffle=True)
 
@@ -86,7 +89,7 @@ if __name__ == '__main__':
                     segment = None, # tp.Optional[float]
                     name = 'unset').cuda()
 
-        state_dict = torch.load(inp_args.model_path)
+        state_dict = torch.load(inp_args.inf_model_path)
         model_dict = OrderedDict()
         pattern = re.compile('module.')
         for k,v in state_dict.items():
@@ -103,17 +106,28 @@ if __name__ == '__main__':
     idx = 0
     #note1 = 'multi' if inp_args.multi else 'single'
     #note2 = inp_args.note2
-    num_inference=5
+    num_inference = 100
     # for s in valid_loader:
 
+    tot_sdr = 0
+    tot_stoi = 0
+    tot_pesq = 0
+    skipped = 0
+
     for idx, batch in enumerate(valid_loader):
-        print(f"[Idx] : {idx}/{len(valid_loader)}")
+        if not num_inference:
+            print(f"[Idx] : {idx+1}/{len(valid_loader)}")
+        else:
+            print(f"[Idx] : {idx+1}/{num_inference}")
+
         
-        s = batch[0]
+        s, s_mix = batch
         
         # s shape (64, 1, 16000)
-        
-        s = s.to(torch.float).cuda()
+        if inp_args.mixture:
+            s = s_mix.to(torch.float).cuda()
+        else:
+            s = s.to(torch.float).cuda()
 
         # s /= torch.max(torch.abs(s))
 
@@ -126,7 +140,6 @@ if __name__ == '__main__':
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
         e_rate = entropy_rate(qtz_emb)
-        print(e_rate)
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # plt.plot(s_hat.squeeze().cpu().data.numpy())
@@ -134,14 +147,37 @@ if __name__ == '__main__':
         # # plt.show()
         # plt.clf()
 
+        sdr = cal_sdr(s, s_hat)
+    
         if inp_args.sr != 16000:
             s_hat = signal.resample(s_hat.squeeze().cpu().data.numpy(), 16000*5)
         else:
             s_hat = s_hat.squeeze().cpu().data.numpy()
 
         s = s.squeeze().cpu().data.numpy()
-        #wavfile.write(f"{inp_args.output}/s_{idx}_{note1}.wav", 16000, s/max(abs(s)))
-        #wavfile.write(f"{inp_args.output}/sh_{idx}_{note1}_{note2}.wav", 16000, s_hat/max(abs(s_hat)))
+        try:
+            p = pesq(inp_args.sr, s, s_hat, 'wb')
+        except:
+            skipped+=1
+            continue
+        st = stoi(s, s_hat, inp_args.sr, True)
+
+        tot_sdr += sdr.data
+        tot_pesq+=p 
+        tot_stoi+=st
+        wavfile.write(f"{inp_args.inf_output_path}/s_{idx}.wav", 16000, s/max(abs(s)))
+        wavfile.write(f"{inp_args.inf_output_path}/sh_{idx}.wav", 16000, s_hat/max(abs(s_hat)))
 
         if num_inference and idx==num_inference:
+            tot_sdr/=(num_inference-skipped)
+            tot_pesq/=(num_inference-skipped)
+            tot_stoi/=(num_inference-skipped)
+            print(f"[SDR]: {tot_sdr:0.4f} [ePESQ]: {tot_pesq:0.4f} [eSTOI]: {tot_stoi:0.4f}")
+            print(f"Skipped {skipped}")
             break
+    if not num_inference:
+        tot_sdr/=(len(valid_loader)-skipped)
+        tot_pesq/=(len(valid_loader)-skipped)
+        tot_stoi/=(len(valid_loader)-skipped)
+        print(f"[SDR]: {tot_sdr:0.4f} [ePESQ]: {tot_pesq:0.4f} [eSTOI]: {tot_stoi:0.4f}")
+        print(f"Skipped {skipped}")

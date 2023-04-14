@@ -3,22 +3,26 @@ output_dir: "/home/anakuzne/exp/encodec_04_2023/saved_models"
 data_path: "/data/common"
 csv_path: "/home/anakuzne/utils/csvs/encodec_ds.csv"
 mixture: False
-standardize: False
-exp_name: "encodec_ft_base_bw3_no_se"
+standardize: True
+exp_name: "encodec_base"
 finetune_model: "/home/anakuzne/projects/encodec_hy/encodec/ckpt/epoch1999_model.amlt"
-#finetune_disc: "/home/anakuzne/projects/encodec_hy/encodec/ckpt/encodec_unstd_disc.amlt"
-finetune_disc: False
+finetune_disc: "/home/anakuzne/projects/encodec_hy/encodec/ckpt/encodec_unstd_disc.amlt"
+
+#For inference 
+inf_model_path: "/home/anakuzne/exp/encodec_04_2023/saved_models/encodec_base_lr3e-5_bw3__with_disc_disc_freq5_std_all_unfreeze_best.amlt"
+inf_output_path: "/home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs"
 
 #Training params
 use_disc: True
-disc_freq: 1
+disc_freq: 5
 bandwidth: 3
-batch_size: 1
+batch_size: 8
 freeze_enc: False
 freeze_dec: False
 sr: 16000
 
 use_se_loss: False
-lr_gen: 3e-4
-lr_disc: 3e-4
-debug: True
+lt_weight: 1
+lr_gen: 3e-5
+lr_disc: 3e-5
+debug: False

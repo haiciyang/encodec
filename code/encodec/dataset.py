@@ -32,6 +32,7 @@ class EnCodec_data(Dataset):
 		dir_idx = random.randint(0, len(self.mixture_data)-1)
 		noise_dir = self.mixture_data[dir_idx]
 		noise_files = os.listdir(noise_dir)
+		noise_files = [i for i in noise_files if '.wav' in i]
 		file_idx = random.randint(0, len(noise_files)-1)
 		_, noise = wavfile.read(f"{noise_dir}/{noise_files[file_idx]}")
 		return noise
@@ -46,7 +47,7 @@ class EnCodec_data(Dataset):
 
 		if speech_len > noise_len:
 			repeat = (speech_len//noise_len) +1
-			noise = torch.tile(noise, (1, repeat))
+			noise = np.tile(noise, (1, repeat))
 			diff = speech_len - noise.shape[1]
 			noise = noise[:, :noise.shape[1]+diff]          
 				
@@ -56,12 +57,18 @@ class EnCodec_data(Dataset):
 
 	def mix_signals(self, speech, noise, desired_snr):   
 		#calculate energies
-		energy_s = torch.sum(speech**2, dim=-1, keepdim=True)
-		energy_n = torch.sum(noise**2, dim=-1, keepdim=True)
+		energy_s = np.sum(speech**2, axis=1,keepdims=True)
+		energy_n = np.sum(noise**2, axis=1, keepdims=True)
 
-		b = torch.sqrt((energy_s / energy_n) * (10 ** (-desired_snr / 10.)))
+		b = np.sqrt((energy_s / energy_n) * (10 ** (-desired_snr / 10.)))
 		return speech + b * noise
 
+	def standardize_f(self, seg):
+		seg = seg / (np.std(seg) + 1e-20)
+		gain = np.random.randint(-10, 7, (1,))
+		scale = np.power(10, gain/20)
+		seg *= scale
+		return seg
 
 	def get_seq(self, idx, seg_len=5):
 		row = self.df_part.iloc[idx]
@@ -74,20 +81,33 @@ class EnCodec_data(Dataset):
 		end_idx = st_idx + seg_len*fs
 		seg = wav[st_idx:end_idx]
 
-		if self.standardize:
+		if (self.standardize) and (self.mixture):
 			# Normalize and add random gain
-			seg = seg / (np.std(seg) + 1e-20)
-			
-			gain = np.random.randint(-10, 7, (1,))
-			scale = np.power(10, gain/20)
-			seg *= scale
-		seg = seg.reshape(1, -1)
-		
-		if self.mixture:
-			noise = self.sample_noise()
-			noise = self.pad_mode(seg, noise)
+			seg = self.standardize_f(seg)
+			seg = seg.reshape(1, -1)
+
+			noise = self.sample_noise().reshape(1, -1)
+			noise = self.pad_noise(seg, noise)
+			noise = self.standardize_f(noise)
 			snr = random.randint(-5, 5)
-			x = self.mix_signals(seg, noise, snr)
+			x_seg = self.mix_signals(seg, noise, snr)
+
+		elif (self.mixture) and (not self.standardize):
+			#if no standartization is done, normalize the signals instead
+			seg = seg.reshape(1, -1)
+			seg = seg/np.linalg.norm(seg)
+			noise = self.sample_noise().reshape(1, -1)
+			noise = self.pad_noise(seg, noise)
+			noise = noise/np.linalg.norm(noise)
+			snr = random.randint(-5, 5)
+			x_seg = self.mix_signals(seg, noise, snr)
+		
+		elif (self.standardize) and (not self.mixture):
+			seg = self.standardize_f(seg)
+			seg = seg.reshape(1, -1)
+			x_seg = seg
+
 		else:
+			seg = seg.reshape(1, -1)
 			x_seg = seg
 		return seg, x_seg

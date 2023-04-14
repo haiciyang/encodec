@@ -1,0 +1,96 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.14.0
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.11.2
+    start_time: 1681404799.637855
+    t:
+      1:
+      - 1
+      - 55
+      2:
+      - 1
+      - 55
+      3:
+      - 16
+      - 17
+      - 23
+      - 37
+      4: 3.11.2
+      5: 0.14.0
+      8:
+      - 5
+bandwidth:
+  desc: null
+  value: 3
+batch_size:
+  desc: null
+  value: 8
+csv_path:
+  desc: null
+  value: /home/anakuzne/utils/csvs/encodec_ds.csv
+data_path:
+  desc: null
+  value: /data/common
+debug:
+  desc: null
+  value: false
+disc_freq:
+  desc: null
+  value: 5
+exp_name:
+  desc: null
+  value: encodec_ft
+finetune_disc:
+  desc: null
+  value: /home/anakuzne/exp/encodec_04_2023/ls_pretrained/encodec_base_lr3e-5_bw3__with_disc_disc_freq5_std_all_unfreeze_disc_best.amlt
+finetune_model:
+  desc: null
+  value: /home/anakuzne/exp/encodec_04_2023/ls_pretrained/encodec_base_lr3e-5_bw3__with_disc_disc_freq5_std_all_unfreeze_best.amlt
+freeze_dec:
+  desc: null
+  value: false
+freeze_enc:
+  desc: null
+  value: false
+from_ls:
+  desc: null
+  value: true
+inf_model_path:
+  desc: null
+  value: /home/anakuzne/exp/encodec_04_2023/ls_pretrained/encodec_base_lr3e-5_bw3__with_disc_disc_freq5_std_all_unfreeze_best.amlt
+inf_output_path:
+  desc: null
+  value: /home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs
+lr_disc:
+  desc: null
+  value: 3e-5
+lr_gen:
+  desc: null
+  value: 3e-5
+lt_weight:
+  desc: null
+  value: 1
+mixture:
+  desc: null
+  value: true
+output_dir:
+  desc: null
+  value: /home/anakuzne/exp/encodec_04_2023/saved_models
+sr:
+  desc: null
+  value: 16000
+standardize:
+  desc: null
+  value: true
+use_disc:
+  desc: null
+  value: true
+use_se_loss:
+  desc: null
+  value: true

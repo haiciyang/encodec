@@ -1,0 +1,36 @@
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (17) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (33) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (65) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (129) may be set too low.
+  warnings.warn(
+[Step]: 100 | [Train losses]: {'l_g': tensor(1.5096), 'l_d': tensor(0.3681), 'l_t': tensor(0.4169), 'l_f': tensor(6.7310e-05), 'l_w': tensor(134.4719), 'l_feat': tensor(0.8277)}
+[Step]: 100 | [Valid losses]: {'val_l_t': tensor(0.3827), 'sdr_tt': tensor(3.9595)}
+Prev SDR -inf, Curr SDR 3.9594552516937256
+[Step]: 200 | [Train losses]: {'l_g': tensor(1.5545), 'l_d': tensor(0.3399), 'l_t': tensor(0.3609), 'l_f': tensor(3.7590e-05), 'l_w': tensor(97.4372), 'l_feat': tensor(0.6886)}
+[Step]: 200 | [Valid losses]: {'val_l_t': tensor(0.3820), 'sdr_tt': tensor(4.3116)}
+Prev SDR 3.9594552516937256, Curr SDR 4.311609268188477
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 447, in <module>
+    l_f = melspec_loss(s, s_hat, gpu_rank, range(5,12))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 114, in melspec_loss
+    mel_transform = transforms.MelSpectrogram(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/transforms/_transforms.py", line 638, in __init__
+    self.mel_scale = MelScale(
+                     ^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/transforms/_transforms.py", line 399, in __init__
+    fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py", line 568, in melscale_fbanks
+    fb = _create_triangular_filterbank(all_freqs, f_pts)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py", line 505, in _create_triangular_filterbank
+    zero = torch.zeros(1)
+           ^^^^^^^^^^^^^^
+KeyboardInterrupt

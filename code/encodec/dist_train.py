@@ -29,7 +29,7 @@ from .model import EncodecModel
 from .msstftd import MultiScaleSTFTDiscriminator as MSDisc
 from .balancer import Balancer
 import yaml
-from itertools import cycle
+import time
 
 class ParamDict(dict):
     def __getattr__(self, name):
@@ -158,8 +158,8 @@ def train(model, disc, train_loader, valid_loader,
         quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
-        batch_entropy = entropy_rate(qtz_emb)
-        ep_entropy+=batch_entropy.data
+        #batch_entropy = entropy_rate(qtz_emb)
+        #ep_entropy+=batch_entropy.data
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # --- Update Generator ---
@@ -201,7 +201,7 @@ def train(model, disc, train_loader, valid_loader,
 
             l_w.backward(retain_graph=True)
             losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
-            balancer = Balancer(weights={'l_t': 0.1, 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
+            balancer = Balancer(weights={'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
             balancer.backward(losses, s_hat)
 
 
@@ -240,7 +240,7 @@ def train(model, disc, train_loader, valid_loader,
                     'l_f': f_loss/steps, 
                     'l_w': w_loss/steps, 
                     'l_feat': feat_loss/steps,
-                    'tr_entropy':ep_entropy/steps}
+                }
 
             wandb.log(log_losses)
 
@@ -275,7 +275,7 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
 
     # ---------- Run model ------------
     t_loss, sdr_tt, val_entropy = 0, 0, 0
-    for batch in valid_loader:
+    for idx, batch in enumerate(valid_loader):
 
         # s shape (64, 1, 16000)
         s, x = batch
@@ -289,8 +289,8 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
         quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
-        batch_entropy = entropy_rate(qtz_emb)
-        val_entropy+=batch_entropy
+        #batch_entropy = entropy_rate(qtz_emb)
+        #val_entropy+=batch_entropy
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # ------ Reconstruction loss l_t, l_f --------
@@ -302,8 +302,7 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
 
         if debug:
             break
-
-    losses = {'val_l_t': t_loss/len(valid_loader), 'sdr_tt': sdr_tt/len(valid_loader), 'val_entropy':val_entropy/len(valid_loader)}
+    losses = {'val_l_t': t_loss/len(valid_loader), 'sdr_tt': sdr_tt/len(valid_loader)}
     return losses
 
 def get_args():
@@ -344,42 +343,14 @@ if __name__ == '__main__':
     config = sys.argv[1]
     inp_args, config_dict = load_config(config)
 
-    args = get_args()
-
-    #run_ddp = False if len(args) == 1 else True
-    run_ddp = False
-    #CUDA_VISBLE_DEVICES=6,7 python -m torch.distributed.run -m encodec.dist_train encodec/config/config_base.yaml
-    if run_ddp:
-        master_uri = "tcp://%s:%s" % (args.get("MASTER_ADDR"), args.get("MASTER_PORT"))
-        os.environ["NCCL_DEBUG"] = "WARN"
-        node_rank = args.get("NODE_RANK")
-
-        gpus_per_node = torch.cuda.device_count()
-        world_size = args.get("WORLD_SIZE")
-        gpu_rank = args.get("LOCAL_RANK")
-        if inp_args.debug:
-            node_rank = 0
-        global_rank = node_rank * gpus_per_node + gpu_rank
-        dist.init_process_group(
-            backend="nccl", init_method=master_uri, world_size=world_size, rank=global_rank
-        )
-
     train_dataset = EnCodec_data(ds_path=inp_args.data_path, csv_path=inp_args.csv_path, task = 'train', mixture=inp_args.mixture, standardize=inp_args.standardize)
     valid_dataset = EnCodec_data(ds_path=inp_args.data_path, csv_path=inp_args.csv_path, task = 'val',  mixture=inp_args.mixture, standardize=inp_args.standardize)
 
-    if run_ddp:
-        train_sampler = DistributedSampler(dataset=train_dataset, shuffle=True) 
-        valid_sampler = DistributedSampler(dataset=valid_dataset, shuffle=True) 
-        train_loader = DataLoader(train_dataset, batch_size=inp_args.batch_size, sampler=train_sampler, pin_memory=True)
-        valid_loader = DataLoader(valid_dataset, batch_size=inp_args.batch_size, sampler=valid_sampler, pin_memory=True)
-        torch.manual_seed(global_rank)
-        torch.cuda.set_device(gpu_rank)    
-    else:
-        train_loader = DataLoader(train_dataset, batch_size=inp_args.batch_size, pin_memory=True)
-        valid_loader = DataLoader(valid_dataset, batch_size=inp_args.batch_size, pin_memory=True)
-        gpu_rank = 0
-
+   
+    train_loader = DataLoader(train_dataset, batch_size=inp_args.batch_size, pin_memory=True)
+    valid_loader = DataLoader(valid_dataset, batch_size=inp_args.batch_size, pin_memory=True)
     gpu_rank = 0
+
     # get new model
     model = EncodecModel._get_model(
                    target_bandwidths = [1.5, 3, 6], 
@@ -394,11 +365,13 @@ if __name__ == '__main__':
     model.set_target_bandwidth(inp_args.bandwidth)
 
     if inp_args.finetune_model:
+        print("Loaded model...")
         load_model(model, inp_args.finetune_model)
-
+    
     disc = MSDisc(filters=32).cuda(gpu_rank)
 
     if inp_args.finetune_disc:
+        print("Loaded discriminator...")
         load_model(disc, inp_args.finetune_disc)
     
 
@@ -409,11 +382,18 @@ if __name__ == '__main__':
         which = 'decoder' if inp_args.freeze_dec else 'encoder'
         freeze_params(model, which)
     
-    if run_ddp:
-        model = nn.parallel.DistributedDataParallel(model, device_ids=[gpu_rank])    
-        disc = nn.parallel.DistributedDataParallel(disc, device_ids=[gpu_rank])
-   
-    run_name = f"{inp_args.exp_name}_lr{inp_args.lr_gen}"
+    se_str = f'se_lt_weight_{inp_args.lt_weight}' if inp_args.use_se_loss else ''
+    disc_str = 'with_disc' if inp_args.finetune_disc else ''
+    freq_str = f'disc_freq{inp_args.disc_freq}'
+    std_str = 'std' if {inp_args.standardize} else 'no_std'
+    from_ls = 'from_ls' if inp_args.from_ls else ''
+    run_name = f"{inp_args.exp_name}_lr{inp_args.lr_gen}_bw{inp_args.bandwidth}_{se_str}_{disc_str}_{freq_str}_{std_str}_{from_ls}"
+
+    if inp_args.freeze_dec or inp_args.freeze_enc:
+        freeze_str = "freeze_enc" if inp_args.freeze_enc else "freeze_dec"
+    else:
+        freeze_str = 'all_unfreeze'
+    print(f"RUN NAME: {run_name}")
 
     if not inp_args.debug:
         wandb.init(config=config_dict, project='encodec-se', entity='anakuzne')
@@ -423,14 +403,17 @@ if __name__ == '__main__':
     START MAIN TRAINING LOOP HERE
     '''
 
-    step = 0
-    batch_idx = 0
-    log_steps = 10
+    step = 1
+    log_steps = 100
     tot_steps = 1000000
-    loss = torch.tensor(float('-inf'))
+    track_sdr = torch.tensor(float('-inf'))
 
     g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, ep_entropy = 0,0,0,0,0,0,0
     model.train()
+
+    curr_time = round(time.time()*1000)
+    if not os.path.exists(f"{inp_args.output_dir}/{curr_time}"):
+        os.makedirs(f"{inp_args.output_dir}/{curr_time}")
 
     for ep in range(2000):
         for idx, batch in enumerate(train_loader):
@@ -449,8 +432,8 @@ if __name__ == '__main__':
             quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=inp_args.bandwidth) # !!! should be frame_rate - 50
                 # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
             qtz_emb = quantizedResult.quantized
-            batch_entropy = entropy_rate(qtz_emb)
-            ep_entropy+=batch_entropy.data
+            #batch_entropy = entropy_rate(qtz_emb)
+            #ep_entropy+=batch_entropy.data
             s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
             # --- Update Generator ---
@@ -484,15 +467,14 @@ if __name__ == '__main__':
                     l_g += 1/K * torch.mean(torch.max(torch.tensor(0), 1-s_disc_gen[d_id])) # Gen loss
 
                     for l_id in range(len(fmap_r[0])):
-                        l_feat += 1/(K*L) * torch.mean(abs(fmap_r[d_id][l_id] - \
-                                fmap_gen[d_id][l_id]))/torch.mean(abs(fmap_r[d_id][l_id]))
+                        l_feat += 1/(K*L) * torch.mean(abs(fmap_r[d_id][l_id] - fmap_gen[d_id][l_id]))/torch.mean(abs(fmap_r[d_id][l_id]))
 
                 g_loss += l_g.detach().data.cpu()
                 feat_loss += l_feat.detach().data.cpu()
 
                 l_w.backward(retain_graph=True)
                 losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
-                balancer = Balancer(weights={'l_t': 0.1, 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
+                balancer = Balancer(weights={'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
                 balancer.backward(losses, s_hat)
                 optimizer_G.step()
 
@@ -512,20 +494,19 @@ if __name__ == '__main__':
 
                     d_loss += l_d.detach().data.cpu()
 
-                else:
-                    loss = 0.1 * l_t + l_f + l_w
-                    loss.backward()
-                    optimizer_G.step()
+            else:
+                loss = (float(inp_args.lt_weight) * l_t) + l_f + l_w
+                loss.backward()
+                optimizer_G.step()
             
             
-            if step%log_steps==0:
+            if  step%log_steps==0:
                 log_losses = {'l_g': g_loss/log_steps, 
                         'l_d': d_loss/log_steps, 
                         'l_t': t_loss/log_steps, 
                         'l_f': f_loss/log_steps, 
                         'l_w': w_loss/log_steps, 
-                        'l_feat': feat_loss/log_steps,
-                        'tr_entropy':ep_entropy/log_steps}
+                        'l_feat': feat_loss/log_steps,}
                 if not inp_args.debug:
                     wandb.log(log_losses)
                 print(f"[Step]: {step} | [Train losses]: {log_losses}")
@@ -539,13 +520,15 @@ if __name__ == '__main__':
                         wandb.log(val_losses)
                     vall = list(val_losses.values())[-1] # sdr
                     #If SDR is larger than previous, save new checkpoint
-                    if vall > loss:
-                        loss = vall
-                        torch.save(model.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}_best.amlt')
-                        torch.save(disc.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}_disc_best.amlt')
+                    
+                    if vall > track_sdr:
+                        print(f'Prev SDR {track_sdr}, Curr SDR {vall}')
+                        track_sdr = vall
+                        torch.save(model.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_best.amlt')
+                        torch.save(disc.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_disc_best.amlt')
 
-                    torch.save(model.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}_latest.amlt')
-                    torch.save(disc.state_dict(), f'{inp_args.output_dir}/{inp_args.exp_name}_disc_latest.amlt')
+                    torch.save(model.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_latest.amlt')
+                    torch.save(disc.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_disc_latest.amlt')
 
                 model.train()
 

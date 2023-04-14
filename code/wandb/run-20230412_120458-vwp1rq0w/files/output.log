@@ -1,0 +1,84 @@
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (17) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (33) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (65) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (129) may be set too low.
+  warnings.warn(
+[Step]: 100 | [Train losses]: {'l_g': tensor(1.5108), 'l_d': tensor(0.3681), 'l_t': tensor(0.4242), 'l_f': tensor(6.1626e-05), 'l_w': tensor(132.2339), 'l_feat': tensor(0.8211)}
+[Step]: 100 | [Valid losses]: {'val_l_t': tensor(0.3820), 'sdr_tt': tensor(3.9800)}
+[Step]: 200 | [Train losses]: {'l_g': tensor(1.5382), 'l_d': tensor(0.3412), 'l_t': tensor(0.3577), 'l_f': tensor(3.5040e-05), 'l_w': tensor(94.0813), 'l_feat': tensor(0.6759)}
+[Step]: 200 | [Valid losses]: {'val_l_t': tensor(0.3790), 'sdr_tt': tensor(4.2855)}
+[Step]: 300 | [Train losses]: {'l_g': tensor(1.5207), 'l_d': tensor(0.3310), 'l_t': tensor(0.3933), 'l_f': tensor(7.0766e-05), 'l_w': tensor(73.1215), 'l_feat': tensor(0.7593)}
+[Step]: 300 | [Valid losses]: {'val_l_t': tensor(0.3657), 'sdr_tt': tensor(4.3298)}
+[Step]: 400 | [Train losses]: {'l_g': tensor(1.4577), 'l_d': tensor(0.3686), 'l_t': tensor(0.4326), 'l_f': tensor(8.7044e-05), 'l_w': tensor(61.3603), 'l_feat': tensor(0.7816)}
+[Step]: 400 | [Valid losses]: {'val_l_t': tensor(0.3685), 'sdr_tt': tensor(4.1718)}
+[Step]: 500 | [Train losses]: {'l_g': tensor(1.4829), 'l_d': tensor(0.3334), 'l_t': tensor(0.3780), 'l_f': tensor(5.0457e-05), 'l_w': tensor(54.9824), 'l_feat': tensor(0.7205)}
+[Step]: 500 | [Valid losses]: {'val_l_t': tensor(0.3588), 'sdr_tt': tensor(4.5447)}
+[Step]: 600 | [Train losses]: {'l_g': tensor(1.5210), 'l_d': tensor(0.3249), 'l_t': tensor(0.3505), 'l_f': tensor(3.4921e-05), 'l_w': tensor(53.5250), 'l_feat': tensor(0.6718)}
+[Step]: 600 | [Valid losses]: {'val_l_t': tensor(0.3459), 'sdr_tt': tensor(4.7355)}
+[Step]: 700 | [Train losses]: {'l_g': tensor(1.5891), 'l_d': tensor(0.3505), 'l_t': tensor(0.3342), 'l_f': tensor(2.8769e-05), 'l_w': tensor(45.6789), 'l_feat': tensor(0.6627)}
+[Step]: 700 | [Valid losses]: {'val_l_t': tensor(0.3338), 'sdr_tt': tensor(4.9295)}
+[Step]: 800 | [Train losses]: {'l_g': tensor(1.4306), 'l_d': tensor(0.3357), 'l_t': tensor(0.3375), 'l_f': tensor(5.1922e-05), 'l_w': tensor(42.5963), 'l_feat': tensor(0.7024)}
+[Step]: 800 | [Valid losses]: {'val_l_t': tensor(0.3522), 'sdr_tt': tensor(4.5069)}
+[Step]: 900 | [Train losses]: {'l_g': tensor(1.4918), 'l_d': tensor(0.3172), 'l_t': tensor(0.3344), 'l_f': tensor(3.0632e-05), 'l_w': tensor(40.2482), 'l_feat': tensor(0.6650)}
+[Step]: 900 | [Valid losses]: {'val_l_t': tensor(0.3458), 'sdr_tt': tensor(4.7192)}
+[Step]: 1000 | [Train losses]: {'l_g': tensor(1.5763), 'l_d': tensor(0.3128), 'l_t': tensor(0.3163), 'l_f': tensor(2.9927e-05), 'l_w': tensor(35.9524), 'l_feat': tensor(0.6371)}
+[Step]: 1000 | [Valid losses]: {'val_l_t': tensor(0.3397), 'sdr_tt': tensor(4.4718)}
+[Step]: 1100 | [Train losses]: {'l_g': tensor(1.4711), 'l_d': tensor(0.3494), 'l_t': tensor(0.3870), 'l_f': tensor(6.3234e-05), 'l_w': tensor(35.9232), 'l_feat': tensor(0.7493)}
+[Step]: 1100 | [Valid losses]: {'val_l_t': tensor(0.3457), 'sdr_tt': tensor(4.5927)}
+[Step]: 1200 | [Train losses]: {'l_g': tensor(1.5327), 'l_d': tensor(0.3395), 'l_t': tensor(0.3676), 'l_f': tensor(5.0572e-05), 'l_w': tensor(34.2949), 'l_feat': tensor(0.7279)}
+[Step]: 1200 | [Valid losses]: {'val_l_t': tensor(0.3432), 'sdr_tt': tensor(4.6426)}
+[Step]: 1300 | [Train losses]: {'l_g': tensor(1.5724), 'l_d': tensor(0.3274), 'l_t': tensor(0.3262), 'l_f': tensor(2.6249e-05), 'l_w': tensor(34.5060), 'l_feat': tensor(0.6458)}
+[Step]: 1300 | [Valid losses]: {'val_l_t': tensor(0.3401), 'sdr_tt': tensor(4.7931)}
+[Step]: 1400 | [Train losses]: {'l_g': tensor(1.5503), 'l_d': tensor(0.3456), 'l_t': tensor(0.3677), 'l_f': tensor(3.5473e-05), 'l_w': tensor(34.4731), 'l_feat': tensor(0.6773)}
+[Step]: 1400 | [Valid losses]: {'val_l_t': tensor(0.3471), 'sdr_tt': tensor(4.6644)}
+[Step]: 1500 | [Train losses]: {'l_g': tensor(1.5797), 'l_d': tensor(0.3462), 'l_t': tensor(0.4312), 'l_f': tensor(4.4209e-05), 'l_w': tensor(33.2428), 'l_feat': tensor(0.7272)}
+[Step]: 1500 | [Valid losses]: {'val_l_t': tensor(0.3450), 'sdr_tt': tensor(4.7845)}
+[Step]: 1600 | [Train losses]: {'l_g': tensor(1.5511), 'l_d': tensor(0.3255), 'l_t': tensor(0.3100), 'l_f': tensor(3.5168e-05), 'l_w': tensor(28.8728), 'l_feat': tensor(0.6247)}
+[Step]: 1600 | [Valid losses]: {'val_l_t': tensor(0.3343), 'sdr_tt': tensor(4.9638)}
+[Step]: 1700 | [Train losses]: {'l_g': tensor(1.4698), 'l_d': tensor(0.3583), 'l_t': tensor(0.3376), 'l_f': tensor(3.3437e-05), 'l_w': tensor(29.5005), 'l_feat': tensor(0.6634)}
+[Step]: 1700 | [Valid losses]: {'val_l_t': tensor(0.3360), 'sdr_tt': tensor(4.7317)}
+[Step]: 1800 | [Train losses]: {'l_g': tensor(1.4834), 'l_d': tensor(0.3615), 'l_t': tensor(0.3157), 'l_f': tensor(2.9322e-05), 'l_w': tensor(29.8250), 'l_feat': tensor(0.6475)}
+[Step]: 1800 | [Valid losses]: {'val_l_t': tensor(0.3530), 'sdr_tt': tensor(4.6800)}
+[Step]: 1900 | [Train losses]: {'l_g': tensor(1.4935), 'l_d': tensor(0.3258), 'l_t': tensor(0.3507), 'l_f': tensor(4.2476e-05), 'l_w': tensor(31.0012), 'l_feat': tensor(0.6690)}
+[Step]: 1900 | [Valid losses]: {'val_l_t': tensor(0.3524), 'sdr_tt': tensor(4.4468)}
+[Step]: 2000 | [Train losses]: {'l_g': tensor(1.5163), 'l_d': tensor(0.3360), 'l_t': tensor(0.3124), 'l_f': tensor(2.7080e-05), 'l_w': tensor(28.6500), 'l_feat': tensor(0.6423)}
+[Step]: 2000 | [Valid losses]: {'val_l_t': tensor(0.3326), 'sdr_tt': tensor(4.9664)}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 417, in <module>
+    for idx, batch in enumerate(train_loader):
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 634, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 678, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/fetch.py", line 54, in fetch
+    return self.collate_fn(data)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 264, in default_collate
+    return collate(batch, collate_fn_map=default_collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 142, in collate
+    return [collate(samples, collate_fn_map=collate_fn_map) for samples in transposed]  # Backwards compatibility.
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 142, in <listcomp>
+    return [collate(samples, collate_fn_map=collate_fn_map) for samples in transposed]  # Backwards compatibility.
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 119, in collate
+    return collate_fn_map[elem_type](batch, collate_fn_map=collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 171, in collate_numpy_array_fn
+    return collate([torch.as_tensor(b) for b in batch], collate_fn_map=collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 119, in collate
+    return collate_fn_map[elem_type](batch, collate_fn_map=collate_fn_map)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torch/utils/data/_utils/collate.py", line 162, in collate_tensor_fn
+    return torch.stack(batch, 0, out=out)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

@@ -1,0 +1,263 @@
+2023-04-12 13:08:20,821 INFO    StreamThr :116046 [internal.py:wandb_internal():87] W&B internal server running at pid: 116046, started at: 2023-04-12 13:08:20.821254
+2023-04-12 13:08:20,825 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status
+2023-04-12 13:08:20,826 INFO    WriterThread:116046 [datastore.py:open_for_write():85] open: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/run-zemkqhun.wandb
+2023-04-12 13:08:20,827 DEBUG   SenderThread:116046 [sender.py:send():336] send: header
+2023-04-12 13:08:20,829 DEBUG   SenderThread:116046 [sender.py:send():336] send: run
+2023-04-12 13:08:21,108 INFO    SenderThread:116046 [dir_watcher.py:__init__():219] watching files in: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files
+2023-04-12 13:08:21,108 INFO    SenderThread:116046 [sender.py:_start_run_threads():1078] run started: zemkqhun with start time 1681319300.819975
+2023-04-12 13:08:21,108 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: summary_record
+2023-04-12 13:08:21,108 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-summary.json with policy end
+2023-04-12 13:08:21,111 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: check_version
+2023-04-12 13:08:21,112 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: check_version
+2023-04-12 13:08:21,192 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: run_start
+2023-04-12 13:08:21,201 DEBUG   HandlerThread:116046 [system_info.py:__init__():31] System info init
+2023-04-12 13:08:21,201 DEBUG   HandlerThread:116046 [system_info.py:__init__():46] System info init done
+2023-04-12 13:08:21,201 INFO    HandlerThread:116046 [system_monitor.py:start():183] Starting system monitor
+2023-04-12 13:08:21,202 INFO    SystemMonitor:116046 [system_monitor.py:_start():147] Starting system asset monitoring threads
+2023-04-12 13:08:21,202 INFO    HandlerThread:116046 [system_monitor.py:probe():204] Collecting system info
+2023-04-12 13:08:21,203 INFO    SystemMonitor:116046 [interfaces.py:start():187] Started cpu monitoring
+2023-04-12 13:08:21,203 INFO    SystemMonitor:116046 [interfaces.py:start():187] Started disk monitoring
+2023-04-12 13:08:21,204 INFO    SystemMonitor:116046 [interfaces.py:start():187] Started gpu monitoring
+2023-04-12 13:08:21,206 INFO    SystemMonitor:116046 [interfaces.py:start():187] Started memory monitoring
+2023-04-12 13:08:21,207 INFO    SystemMonitor:116046 [interfaces.py:start():187] Started network monitoring
+2023-04-12 13:08:21,250 DEBUG   HandlerThread:116046 [system_info.py:probe():195] Probing system
+2023-04-12 13:08:21,253 DEBUG   HandlerThread:116046 [system_info.py:_probe_git():180] Probing git
+2023-04-12 13:08:21,261 DEBUG   HandlerThread:116046 [system_info.py:_probe_git():188] Probing git done
+2023-04-12 13:08:21,261 DEBUG   HandlerThread:116046 [system_info.py:probe():240] Probing system done
+2023-04-12 13:08:21,261 DEBUG   HandlerThread:116046 [system_monitor.py:probe():213] {'os': 'Linux-5.15.0-58-generic-x86_64-with-glibc2.31', 'python': '3.11.2', 'heartbeatAt': '2023-04-12T17:08:21.250295', 'startedAt': '2023-04-12T17:08:20.809327', 'docker': None, 'cuda': None, 'args': ('config/config.yaml',), 'state': 'running', 'program': '-m encodec.dist_train', 'git': {'remote': 'https://github.com/haiciyang/encodec.git', 'commit': '017e16a908c9e45839a68e8c545e064cfa60915d'}, 'email': 'menina.indigena.17@gmail.com', 'root': '/home/anakuzne/projects/encodec_hy/encodec', 'host': 'transformer', 'username': 'anakuzne', 'executable': '/home/anakuzne/miniconda3/envs/encodec/bin/python', 'cpu_count': 32, 'cpu_count_logical': 32, 'cpu_freq': {'current': 2362.1431875, 'min': 1500.0, 'max': 3000.0}, 'cpu_freq_per_core': [{'current': 2954.12, 'min': 1500.0, 'max': 3000.0}, {'current': 3295.491, 'min': 1500.0, 'max': 3000.0}, {'current': 3294.591, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 2774.868, 'min': 1500.0, 'max': 3000.0}, {'current': 3000.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3296.461, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3297.356, 'min': 1500.0, 'max': 3000.0}, {'current': 3298.339, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3296.422, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1497.998, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3297.464, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3297.526, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3296.691, 'min': 1500.0, 'max': 3000.0}, {'current': 3298.302, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3296.222, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}, {'current': 3298.334, 'min': 1500.0, 'max': 3000.0}, {'current': 3298.397, 'min': 1500.0, 'max': 3000.0}, {'current': 1500.0, 'min': 1500.0, 'max': 3000.0}], 'disk': {'total': 3519.746925354004, 'used': 2742.9579315185547}, 'gpu': 'NVIDIA GeForce RTX 3090', 'gpu_count': 8, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}, {'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}, {'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}, {'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}, {'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}, {'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}, {'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}, {'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}], 'memory': {'total': 251.76268005371094}}
+2023-04-12 13:08:21,261 INFO    HandlerThread:116046 [system_monitor.py:probe():214] Finished collecting system info
+2023-04-12 13:08:21,261 INFO    HandlerThread:116046 [system_monitor.py:probe():217] Publishing system info
+2023-04-12 13:08:21,261 DEBUG   HandlerThread:116046 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-04-12 13:08:21,261 DEBUG   HandlerThread:116046 [system_info.py:_save_pip():67] Saving pip packages done
+2023-04-12 13:08:21,261 DEBUG   HandlerThread:116046 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2023-04-12 13:08:22,110 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_created():278] file/dir created: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json
+2023-04-12 13:08:22,110 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_created():278] file/dir created: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/conda-environment.yaml
+2023-04-12 13:08:22,111 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_created():278] file/dir created: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/requirements.txt
+2023-04-12 13:08:24,111 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/conda-environment.yaml
+2023-04-12 13:08:24,333 DEBUG   HandlerThread:116046 [system_info.py:_save_conda():86] Saving conda packages done
+2023-04-12 13:08:24,334 INFO    HandlerThread:116046 [system_monitor.py:probe():219] Finished publishing system info
+2023-04-12 13:08:24,340 DEBUG   SenderThread:116046 [sender.py:send():336] send: files
+2023-04-12 13:08:24,340 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-metadata.json with policy now
+2023-04-12 13:08:24,346 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:08:24,347 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:08:24,431 DEBUG   SenderThread:116046 [sender.py:send():336] send: telemetry
+2023-04-12 13:08:24,431 DEBUG   SenderThread:116046 [sender.py:send():336] send: telemetry
+2023-04-12 13:08:24,431 DEBUG   SenderThread:116046 [sender.py:send():336] send: run
+2023-04-12 13:08:24,584 INFO    SenderThread:116046 [sender.py:send_run():955] updated run: zemkqhun
+2023-04-12 13:08:25,002 INFO    wandb-upload_0:116046 [upload_job.py:push():138] Uploaded file /tmp/tmpj4ku2duewandb/3lh94ss7-wandb-metadata.json
+2023-04-12 13:08:25,111 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/config.yaml
+2023-04-12 13:08:25,112 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_created():278] file/dir created: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-metadata.json
+2023-04-12 13:08:26,112 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_created():278] file/dir created: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:08:26,236 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:08:28,112 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:08:31,237 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:08:36,238 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:08:39,347 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:08:39,347 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:08:41,416 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:08:46,418 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:08:51,421 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:08:52,120 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/config.yaml
+2023-04-12 13:08:54,349 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:08:54,349 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:08:57,426 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:02,427 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:07,428 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:09,349 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:09:09,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:09:10,370 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-12 13:09:10,371 DEBUG   SenderThread:116046 [sender.py:send():336] send: history
+2023-04-12 13:09:10,372 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: summary_record
+2023-04-12 13:09:10,372 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-summary.json with policy end
+2023-04-12 13:09:11,127 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json
+2023-04-12 13:09:13,128 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:09:13,375 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:18,376 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:21,208 DEBUG   SystemMonitor:116046 [system_monitor.py:_start():161] Starting system metrics aggregation loop
+2023-04-12 13:09:21,209 DEBUG   SenderThread:116046 [sender.py:send():336] send: stats
+2023-04-12 13:09:24,210 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:24,349 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:09:24,349 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:09:28,714 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-12 13:09:28,715 DEBUG   SenderThread:116046 [sender.py:send():336] send: history
+2023-04-12 13:09:28,715 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: summary_record
+2023-04-12 13:09:28,716 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-summary.json with policy end
+2023-04-12 13:09:29,133 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json
+2023-04-12 13:09:29,716 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:31,134 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:09:34,717 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:39,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:09:39,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:09:40,416 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:45,417 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:50,417 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:09:51,210 DEBUG   SenderThread:116046 [sender.py:send():336] send: stats
+2023-04-12 13:09:54,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:09:54,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:09:56,410 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:01,411 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:06,411 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:09,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:10:09,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:10:11,412 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:13,077 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-12 13:10:13,078 DEBUG   SenderThread:116046 [sender.py:send():336] send: history
+2023-04-12 13:10:13,078 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: summary_record
+2023-04-12 13:10:13,078 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-summary.json with policy end
+2023-04-12 13:10:13,149 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json
+2023-04-12 13:10:15,149 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:10:17,081 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:21,211 DEBUG   SenderThread:116046 [sender.py:send():336] send: stats
+2023-04-12 13:10:22,212 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:24,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:10:24,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:10:27,418 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:29,492 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: partial_history
+2023-04-12 13:10:29,492 DEBUG   SenderThread:116046 [sender.py:send():336] send: history
+2023-04-12 13:10:29,492 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: summary_record
+2023-04-12 13:10:29,492 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-summary.json with policy end
+2023-04-12 13:10:30,155 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json
+2023-04-12 13:10:31,155 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:10:32,494 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:37,495 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:39,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:10:39,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:10:43,417 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:48,418 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:51,212 DEBUG   SenderThread:116046 [sender.py:send():336] send: stats
+2023-04-12 13:10:54,213 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:10:54,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:10:54,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:10:59,411 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:11:04,412 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:11:09,351 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: stop_status
+2023-04-12 13:11:09,351 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: stop_status
+2023-04-12 13:11:09,428 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:11:13,348 DEBUG   SenderThread:116046 [sender.py:send():336] send: exit
+2023-04-12 13:11:13,348 INFO    SenderThread:116046 [sender.py:send_exit():559] handling exit code: 255
+2023-04-12 13:11:13,349 INFO    SenderThread:116046 [sender.py:send_exit():561] handling runtime: 172
+2023-04-12 13:11:13,349 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-summary.json with policy end
+2023-04-12 13:11:13,349 INFO    SenderThread:116046 [sender.py:send_exit():567] send defer
+2023-04-12 13:11:13,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,350 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 0
+2023-04-12 13:11:13,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,350 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 0
+2023-04-12 13:11:13,350 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 1
+2023-04-12 13:11:13,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,350 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 1
+2023-04-12 13:11:13,350 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,350 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 1
+2023-04-12 13:11:13,350 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 2
+2023-04-12 13:11:13,350 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,350 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 2
+2023-04-12 13:11:13,351 INFO    HandlerThread:116046 [system_monitor.py:finish():193] Stopping system monitor
+2023-04-12 13:11:13,351 DEBUG   SystemMonitor:116046 [system_monitor.py:_start():168] Finished system metrics aggregation loop
+2023-04-12 13:11:13,351 DEBUG   SystemMonitor:116046 [system_monitor.py:_start():172] Publishing last batch of metrics
+2023-04-12 13:11:13,353 INFO    HandlerThread:116046 [interfaces.py:finish():199] Joined cpu monitor
+2023-04-12 13:11:13,353 INFO    HandlerThread:116046 [interfaces.py:finish():199] Joined disk monitor
+2023-04-12 13:11:13,796 INFO    HandlerThread:116046 [interfaces.py:finish():199] Joined gpu monitor
+2023-04-12 13:11:13,796 INFO    HandlerThread:116046 [interfaces.py:finish():199] Joined memory monitor
+2023-04-12 13:11:13,796 INFO    HandlerThread:116046 [interfaces.py:finish():199] Joined network monitor
+2023-04-12 13:11:13,797 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,797 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 2
+2023-04-12 13:11:13,797 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 3
+2023-04-12 13:11:13,798 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,798 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 3
+2023-04-12 13:11:13,798 DEBUG   SenderThread:116046 [sender.py:send():336] send: stats
+2023-04-12 13:11:13,799 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,799 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 3
+2023-04-12 13:11:13,799 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 4
+2023-04-12 13:11:13,799 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,799 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 4
+2023-04-12 13:11:13,800 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,800 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 4
+2023-04-12 13:11:13,800 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 5
+2023-04-12 13:11:13,800 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,800 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 5
+2023-04-12 13:11:13,801 DEBUG   SenderThread:116046 [sender.py:send():336] send: summary
+2023-04-12 13:11:13,801 INFO    SenderThread:116046 [sender.py:_save_file():1332] saving file wandb-summary.json with policy end
+2023-04-12 13:11:13,801 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,801 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 5
+2023-04-12 13:11:13,801 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 6
+2023-04-12 13:11:13,801 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,801 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 6
+2023-04-12 13:11:13,801 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,801 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 6
+2023-04-12 13:11:13,802 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 7
+2023-04-12 13:11:13,802 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: status_report
+2023-04-12 13:11:13,802 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:13,802 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 7
+2023-04-12 13:11:13,802 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:13,802 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 7
+2023-04-12 13:11:14,170 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json
+2023-04-12 13:11:14,349 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: poll_exit
+2023-04-12 13:11:16,170 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:11:16,397 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 8
+2023-04-12 13:11:16,398 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: poll_exit
+2023-04-12 13:11:16,398 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:16,399 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 8
+2023-04-12 13:11:16,399 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:16,399 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 8
+2023-04-12 13:11:16,400 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 9
+2023-04-12 13:11:16,400 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:16,400 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 9
+2023-04-12 13:11:16,400 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:16,400 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 9
+2023-04-12 13:11:16,400 INFO    SenderThread:116046 [dir_watcher.py:finish():365] shutting down directory watcher
+2023-04-12 13:11:17,171 INFO    Thread-13 :116046 [dir_watcher.py:_on_file_modified():295] file/dir modified: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:11:17,172 INFO    SenderThread:116046 [dir_watcher.py:finish():395] scan: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files
+2023-04-12 13:11:17,172 INFO    SenderThread:116046 [dir_watcher.py:finish():409] scan save: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json wandb-summary.json
+2023-04-12 13:11:17,172 INFO    SenderThread:116046 [dir_watcher.py:finish():409] scan save: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/requirements.txt requirements.txt
+2023-04-12 13:11:17,177 INFO    SenderThread:116046 [dir_watcher.py:finish():409] scan save: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-metadata.json wandb-metadata.json
+2023-04-12 13:11:17,177 INFO    SenderThread:116046 [dir_watcher.py:finish():409] scan save: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/conda-environment.yaml conda-environment.yaml
+2023-04-12 13:11:17,177 INFO    SenderThread:116046 [dir_watcher.py:finish():409] scan save: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log output.log
+2023-04-12 13:11:17,177 INFO    SenderThread:116046 [dir_watcher.py:finish():409] scan save: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/config.yaml config.yaml
+2023-04-12 13:11:17,178 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 10
+2023-04-12 13:11:17,182 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:17,185 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 10
+2023-04-12 13:11:17,190 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:17,190 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 10
+2023-04-12 13:11:17,190 INFO    SenderThread:116046 [file_pusher.py:finish():164] shutting down file pusher
+2023-04-12 13:11:17,600 INFO    wandb-upload_0:116046 [upload_job.py:push():138] Uploaded file /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/wandb-summary.json
+2023-04-12 13:11:17,808 INFO    wandb-upload_1:116046 [upload_job.py:push():138] Uploaded file /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/requirements.txt
+2023-04-12 13:11:17,811 INFO    wandb-upload_3:116046 [upload_job.py:push():138] Uploaded file /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/output.log
+2023-04-12 13:11:17,817 INFO    wandb-upload_4:116046 [upload_job.py:push():138] Uploaded file /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/config.yaml
+2023-04-12 13:11:17,821 INFO    wandb-upload_2:116046 [upload_job.py:push():138] Uploaded file /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/files/conda-environment.yaml
+2023-04-12 13:11:18,022 INFO    Thread-12 (_thread_body):116046 [sender.py:transition_state():587] send defer: 11
+2023-04-12 13:11:18,022 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:18,022 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 11
+2023-04-12 13:11:18,023 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:18,023 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 11
+2023-04-12 13:11:18,023 INFO    SenderThread:116046 [file_pusher.py:join():169] waiting for file pusher
+2023-04-12 13:11:18,023 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 12
+2023-04-12 13:11:18,023 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:18,023 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 12
+2023-04-12 13:11:18,023 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:18,023 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 12
+2023-04-12 13:11:18,337 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 13
+2023-04-12 13:11:18,337 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:18,337 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 13
+2023-04-12 13:11:18,338 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:18,338 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 13
+2023-04-12 13:11:18,338 INFO    SenderThread:116046 [sender.py:transition_state():587] send defer: 14
+2023-04-12 13:11:18,338 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: defer
+2023-04-12 13:11:18,338 INFO    HandlerThread:116046 [handler.py:handle_request_defer():170] handle defer: 14
+2023-04-12 13:11:18,338 DEBUG   SenderThread:116046 [sender.py:send():336] send: final
+2023-04-12 13:11:18,338 DEBUG   SenderThread:116046 [sender.py:send():336] send: footer
+2023-04-12 13:11:18,338 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: defer
+2023-04-12 13:11:18,338 INFO    SenderThread:116046 [sender.py:send_request_defer():583] handle sender defer: 14
+2023-04-12 13:11:18,339 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: poll_exit
+2023-04-12 13:11:18,340 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: poll_exit
+2023-04-12 13:11:18,340 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: server_info
+2023-04-12 13:11:18,340 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: get_summary
+2023-04-12 13:11:18,341 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: sampled_history
+2023-04-12 13:11:18,341 DEBUG   SenderThread:116046 [sender.py:send_request():363] send_request: server_info
+2023-04-12 13:11:18,500 INFO    MainThread:116046 [wandb_run.py:_footer_history_summary_info():3422] rendering history
+2023-04-12 13:11:18,501 INFO    MainThread:116046 [wandb_run.py:_footer_history_summary_info():3454] rendering summary
+2023-04-12 13:11:18,503 INFO    MainThread:116046 [wandb_run.py:_footer_sync_info():3380] logging synced files
+2023-04-12 13:11:18,503 DEBUG   HandlerThread:116046 [handler.py:handle_request():144] handle_request: shutdown
+2023-04-12 13:11:18,504 INFO    HandlerThread:116046 [handler.py:finish():842] shutting down handler
+2023-04-12 13:11:19,341 INFO    WriterThread:116046 [datastore.py:close():298] close: /home/anakuzne/projects/encodec_hy/encodec/code/encodec/wandb/run-20230412_130820-zemkqhun/run-zemkqhun.wandb
+2023-04-12 13:11:19,500 INFO    SenderThread:116046 [sender.py:finish():1504] shutting down sender
+2023-04-12 13:11:19,500 INFO    SenderThread:116046 [file_pusher.py:finish():164] shutting down file pusher
+2023-04-12 13:11:19,500 INFO    SenderThread:116046 [file_pusher.py:join():169] waiting for file pusher

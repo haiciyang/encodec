@@ -1,0 +1,70 @@
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (17) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (33) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (65) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (129) may be set too low.
+  warnings.warn(
+[Step]: 100 | [Train losses]: {'l_g': tensor(1.5096), 'l_d': tensor(0.3629), 'l_t': tensor(0.4045), 'l_f': tensor(7.1788e-05), 'l_w': tensor(137.3381), 'l_feat': tensor(0.8220)}
+[Step]: 100 | [Valid losses]: {'val_l_t': tensor(0.3914), 'sdr_tt': tensor(3.9109)}
+[Step]: 200 | [Train losses]: {'l_g': tensor(1.5563), 'l_d': tensor(0.3341), 'l_t': tensor(0.3347), 'l_f': tensor(3.4110e-05), 'l_w': tensor(102.1064), 'l_feat': tensor(0.6777)}
+[Step]: 200 | [Valid losses]: {'val_l_t': tensor(0.3862), 'sdr_tt': tensor(4.3008)}
+[Step]: 300 | [Train losses]: {'l_g': tensor(1.5810), 'l_d': tensor(0.3141), 'l_t': tensor(0.3986), 'l_f': tensor(8.0991e-05), 'l_w': tensor(86.4623), 'l_feat': tensor(0.7665)}
+[Step]: 300 | [Valid losses]: {'val_l_t': tensor(0.3597), 'sdr_tt': tensor(4.5047)}
+[Step]: 400 | [Train losses]: {'l_g': tensor(1.5195), 'l_d': tensor(0.3454), 'l_t': tensor(0.4107), 'l_f': tensor(0.0001), 'l_w': tensor(68.7320), 'l_feat': tensor(0.7714)}
+[Step]: 400 | [Valid losses]: {'val_l_t': tensor(0.3647), 'sdr_tt': tensor(4.4165)}
+[Step]: 500 | [Train losses]: {'l_g': tensor(1.5706), 'l_d': tensor(0.3231), 'l_t': tensor(0.3745), 'l_f': tensor(6.0635e-05), 'l_w': tensor(67.1679), 'l_feat': tensor(0.7104)}
+[Step]: 500 | [Valid losses]: {'val_l_t': tensor(0.3599), 'sdr_tt': tensor(4.7184)}
+[Step]: 600 | [Train losses]: {'l_g': tensor(1.6061), 'l_d': tensor(0.3103), 'l_t': tensor(0.3245), 'l_f': tensor(3.1979e-05), 'l_w': tensor(61.4836), 'l_feat': tensor(0.6563)}
+[Step]: 600 | [Valid losses]: {'val_l_t': tensor(0.3428), 'sdr_tt': tensor(4.9359)}
+[Step]: 700 | [Train losses]: {'l_g': tensor(1.6486), 'l_d': tensor(0.3294), 'l_t': tensor(0.3150), 'l_f': tensor(2.8915e-05), 'l_w': tensor(55.8841), 'l_feat': tensor(0.6497)}
+[Step]: 700 | [Valid losses]: {'val_l_t': tensor(0.3448), 'sdr_tt': tensor(4.9028)}
+[Step]: 800 | [Train losses]: {'l_g': tensor(1.5003), 'l_d': tensor(0.3189), 'l_t': tensor(0.3276), 'l_f': tensor(5.6717e-05), 'l_w': tensor(53.7618), 'l_feat': tensor(0.6935)}
+[Step]: 800 | [Valid losses]: {'val_l_t': tensor(0.3452), 'sdr_tt': tensor(4.5986)}
+[Step]: 900 | [Train losses]: {'l_g': tensor(1.5644), 'l_d': tensor(0.3050), 'l_t': tensor(0.3136), 'l_f': tensor(3.2053e-05), 'l_w': tensor(48.8838), 'l_feat': tensor(0.6536)}
+[Step]: 900 | [Valid losses]: {'val_l_t': tensor(0.3304), 'sdr_tt': tensor(4.9511)}
+[Step]: 1000 | [Train losses]: {'l_g': tensor(1.6199), 'l_d': tensor(0.2972), 'l_t': tensor(0.2942), 'l_f': tensor(3.0692e-05), 'l_w': tensor(42.6646), 'l_feat': tensor(0.6265)}
+[Step]: 1000 | [Valid losses]: {'val_l_t': tensor(0.3364), 'sdr_tt': tensor(4.7231)}
+[Step]: 1100 | [Train losses]: {'l_g': tensor(1.5077), 'l_d': tensor(0.3268), 'l_t': tensor(0.3736), 'l_f': tensor(7.7116e-05), 'l_w': tensor(45.6065), 'l_feat': tensor(0.7486)}
+[Step]: 1100 | [Valid losses]: {'val_l_t': tensor(0.3369), 'sdr_tt': tensor(4.7650)}
+[Step]: 1200 | [Train losses]: {'l_g': tensor(1.5770), 'l_d': tensor(0.3235), 'l_t': tensor(0.3672), 'l_f': tensor(6.5193e-05), 'l_w': tensor(43.7210), 'l_feat': tensor(0.7298)}
+[Step]: 1200 | [Valid losses]: {'val_l_t': tensor(0.3206), 'sdr_tt': tensor(4.8029)}
+[Step]: 1300 | [Train losses]: {'l_g': tensor(1.6263), 'l_d': tensor(0.3100), 'l_t': tensor(0.3173), 'l_f': tensor(2.9785e-05), 'l_w': tensor(44.2972), 'l_feat': tensor(0.6460)}
+[Step]: 1300 | [Valid losses]: {'val_l_t': tensor(0.3318), 'sdr_tt': tensor(4.8672)}
+[Step]: 1400 | [Train losses]: {'l_g': tensor(1.6356), 'l_d': tensor(0.3199), 'l_t': tensor(0.3462), 'l_f': tensor(3.8852e-05), 'l_w': tensor(41.1732), 'l_feat': tensor(0.6819)}
+[Step]: 1400 | [Valid losses]: {'val_l_t': tensor(0.3278), 'sdr_tt': tensor(4.8679)}
+[Step]: 1500 | [Train losses]: {'l_g': tensor(1.6164), 'l_d': tensor(0.3297), 'l_t': tensor(0.4305), 'l_f': tensor(5.1606e-05), 'l_w': tensor(42.5179), 'l_feat': tensor(0.7290)}
+[Step]: 1500 | [Valid losses]: {'val_l_t': tensor(0.3311), 'sdr_tt': tensor(4.8891)}
+[Step]: 1600 | [Train losses]: {'l_g': tensor(1.6092), 'l_d': tensor(0.3045), 'l_t': tensor(0.2982), 'l_f': tensor(3.9806e-05), 'l_w': tensor(36.5832), 'l_feat': tensor(0.6259)}
+[Step]: 1600 | [Valid losses]: {'val_l_t': tensor(0.3269), 'sdr_tt': tensor(5.0455)}
+[Step]: 1700 | [Train losses]: {'l_g': tensor(1.5630), 'l_d': tensor(0.3397), 'l_t': tensor(0.3314), 'l_f': tensor(4.0379e-05), 'l_w': tensor(38.9675), 'l_feat': tensor(0.6663)}
+[Step]: 1700 | [Valid losses]: {'val_l_t': tensor(0.3250), 'sdr_tt': tensor(4.8666)}
+[Step]: 1800 | [Train losses]: {'l_g': tensor(1.5548), 'l_d': tensor(0.3508), 'l_t': tensor(0.3068), 'l_f': tensor(3.3315e-05), 'l_w': tensor(38.9529), 'l_feat': tensor(0.6443)}
+[Step]: 1800 | [Valid losses]: {'val_l_t': tensor(0.3477), 'sdr_tt': tensor(4.6957)}
+[Step]: 1900 | [Train losses]: {'l_g': tensor(1.5419), 'l_d': tensor(0.3062), 'l_t': tensor(0.3512), 'l_f': tensor(5.4067e-05), 'l_w': tensor(40.5830), 'l_feat': tensor(0.6695)}
+[Step]: 1900 | [Valid losses]: {'val_l_t': tensor(0.3435), 'sdr_tt': tensor(4.6917)}
+[Step]: 2000 | [Train losses]: {'l_g': tensor(1.5699), 'l_d': tensor(0.3237), 'l_t': tensor(0.3138), 'l_f': tensor(3.1586e-05), 'l_w': tensor(39.2463), 'l_feat': tensor(0.6338)}
+[Step]: 2000 | [Valid losses]: {'val_l_t': tensor(0.3331), 'sdr_tt': tensor(5.2053)}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 443, in <module>
+    l_f = melspec_loss(s, s_hat, gpu_rank, range(5,12))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 114, in melspec_loss
+    mel_transform = transforms.MelSpectrogram(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/transforms/_transforms.py", line 638, in __init__
+    self.mel_scale = MelScale(
+                     ^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/transforms/_transforms.py", line 399, in __init__
+    fb = F.melscale_fbanks(n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py", line 568, in melscale_fbanks
+    fb = _create_triangular_filterbank(all_freqs, f_pts)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py", line 508, in _create_triangular_filterbank
+    fb = torch.max(zero, torch.min(down_slopes, up_slopes))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

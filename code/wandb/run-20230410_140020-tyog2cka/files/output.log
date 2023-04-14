@@ -1,0 +1,100 @@
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (17) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (33) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (65) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (129) may be set too low.
+  warnings.warn(
+[Step]: 0 | [Train losses]: {'l_g': tensor(0.0004), 'l_d': tensor(0.0018), 'l_t': tensor(0.0002), 'l_f': tensor(5.4222e-08), 'l_w': tensor(0.0700), 'l_feat': tensor(0.0005), 'tr_entropy': tensor(0.8180)}
+[Step]: 0 | [Valid losses]: {'val_l_t': tensor(0.6483), 'sdr_tt': tensor(-0.1594), 'val_entropy': tensor(1636.0782)}
+[Step]: 2000 | [Train losses]: {'l_g': tensor(1.6221), 'l_d': tensor(1.5559), 'l_t': tensor(0.4059), 'l_f': tensor(4.5599e-05), 'l_w': tensor(51.6026), 'l_feat': tensor(0.7594), 'tr_entropy': tensor(1636.0638)}
+[Step]: 2000 | [Valid losses]: {'val_l_t': tensor(0.3692), 'sdr_tt': tensor(3.9769), 'val_entropy': tensor(1636.0782)}
+[Step]: 4000 | [Train losses]: {'l_g': tensor(1.7120), 'l_d': tensor(1.3999), 'l_t': tensor(0.3997), 'l_f': tensor(3.3880e-05), 'l_w': tensor(37.6056), 'l_feat': tensor(0.7102), 'tr_entropy': tensor(1636.0638)}
+[Step]: 4000 | [Valid losses]: {'val_l_t': tensor(0.3658), 'sdr_tt': tensor(3.8783), 'val_entropy': tensor(1636.0782)}
+[Step]: 6000 | [Train losses]: {'l_g': tensor(1.7552), 'l_d': tensor(1.3313), 'l_t': tensor(0.4012), 'l_f': tensor(3.1176e-05), 'l_w': tensor(40.1183), 'l_feat': tensor(0.6903), 'tr_entropy': tensor(1636.0638)}
+[Step]: 6000 | [Valid losses]: {'val_l_t': tensor(0.3544), 'sdr_tt': tensor(4.1165), 'val_entropy': tensor(1636.0782)}
+[Step]: 8000 | [Train losses]: {'l_g': tensor(1.7610), 'l_d': tensor(1.3227), 'l_t': tensor(0.4479), 'l_f': tensor(3.7336e-05), 'l_w': tensor(60.8598), 'l_feat': tensor(0.6879), 'tr_entropy': tensor(1636.0638)}
+[Step]: 8000 | [Valid losses]: {'val_l_t': tensor(0.3765), 'sdr_tt': tensor(3.5870), 'val_entropy': tensor(1636.0782)}
+[Step]: 10000 | [Train losses]: {'l_g': tensor(1.7707), 'l_d': tensor(1.2992), 'l_t': tensor(0.3580), 'l_f': tensor(2.6342e-05), 'l_w': tensor(38.5982), 'l_feat': tensor(0.6587), 'tr_entropy': tensor(1636.0638)}
+[Step]: 10000 | [Valid losses]: {'val_l_t': tensor(0.3518), 'sdr_tt': tensor(4.1256), 'val_entropy': tensor(1636.0782)}
+[Step]: 12000 | [Train losses]: {'l_g': tensor(1.8208), 'l_d': tensor(1.2682), 'l_t': tensor(0.3895), 'l_f': tensor(2.9986e-05), 'l_w': tensor(38.3977), 'l_feat': tensor(0.6819), 'tr_entropy': tensor(1636.0638)}
+[Step]: 12000 | [Valid losses]: {'val_l_t': tensor(0.3461), 'sdr_tt': tensor(4.2559), 'val_entropy': tensor(1636.0782)}
+[Step]: 14000 | [Train losses]: {'l_g': tensor(1.8318), 'l_d': tensor(1.2470), 'l_t': tensor(0.4863), 'l_f': tensor(2.8712e-05), 'l_w': tensor(48.2732), 'l_feat': tensor(0.6550), 'tr_entropy': tensor(1636.0638)}
+[Step]: 14000 | [Valid losses]: {'val_l_t': tensor(0.3453), 'sdr_tt': tensor(4.1949), 'val_entropy': tensor(1636.0782)}
+[Step]: 16000 | [Train losses]: {'l_g': tensor(1.8198), 'l_d': tensor(1.2589), 'l_t': tensor(0.3612), 'l_f': tensor(2.4214e-05), 'l_w': tensor(38.4768), 'l_feat': tensor(0.6516), 'tr_entropy': tensor(1636.0638)}
+[Step]: 16000 | [Valid losses]: {'val_l_t': tensor(0.3547), 'sdr_tt': tensor(4.1869), 'val_entropy': tensor(1636.0782)}
+[Step]: 18000 | [Train losses]: {'l_g': tensor(1.8372), 'l_d': tensor(1.2554), 'l_t': tensor(0.3596), 'l_f': tensor(2.3857e-05), 'l_w': tensor(38.2587), 'l_feat': tensor(0.6390), 'tr_entropy': tensor(1636.0638)}
+[Step]: 18000 | [Valid losses]: {'val_l_t': tensor(0.3479), 'sdr_tt': tensor(4.0118), 'val_entropy': tensor(1636.0782)}
+[Step]: 20000 | [Train losses]: {'l_g': tensor(1.8496), 'l_d': tensor(1.2341), 'l_t': tensor(0.3629), 'l_f': tensor(2.4567e-05), 'l_w': tensor(38.8307), 'l_feat': tensor(0.6405), 'tr_entropy': tensor(1636.0638)}
+[Step]: 20000 | [Valid losses]: {'val_l_t': tensor(0.3457), 'sdr_tt': tensor(4.3258), 'val_entropy': tensor(1636.0782)}
+[Step]: 22000 | [Train losses]: {'l_g': tensor(1.8500), 'l_d': tensor(1.2435), 'l_t': tensor(0.3993), 'l_f': tensor(2.6512e-05), 'l_w': tensor(39.7736), 'l_feat': tensor(0.6551), 'tr_entropy': tensor(1636.0638)}
+[Step]: 22000 | [Valid losses]: {'val_l_t': tensor(0.3346), 'sdr_tt': tensor(4.3886), 'val_entropy': tensor(1636.0782)}
+[Step]: 24000 | [Train losses]: {'l_g': tensor(1.8231), 'l_d': tensor(1.2397), 'l_t': tensor(0.3384), 'l_f': tensor(2.2234e-05), 'l_w': tensor(37.4291), 'l_feat': tensor(0.6200), 'tr_entropy': tensor(1636.0638)}
+[Step]: 24000 | [Valid losses]: {'val_l_t': tensor(0.3461), 'sdr_tt': tensor(4.1934), 'val_entropy': tensor(1636.0782)}
+[Step]: 26000 | [Train losses]: {'l_g': tensor(1.8670), 'l_d': tensor(1.2336), 'l_t': tensor(0.3897), 'l_f': tensor(2.5160e-05), 'l_w': tensor(39.0350), 'l_feat': tensor(0.6494), 'tr_entropy': tensor(1636.0638)}
+[Step]: 26000 | [Valid losses]: {'val_l_t': tensor(0.3537), 'sdr_tt': tensor(3.9871), 'val_entropy': tensor(1636.0782)}
+[Step]: 28000 | [Train losses]: {'l_g': tensor(1.8892), 'l_d': tensor(1.2101), 'l_t': tensor(0.3595), 'l_f': tensor(2.4026e-05), 'l_w': tensor(37.9724), 'l_feat': tensor(0.6398), 'tr_entropy': tensor(1636.0638)}
+[Step]: 28000 | [Valid losses]: {'val_l_t': tensor(0.3381), 'sdr_tt': tensor(4.2887), 'val_entropy': tensor(1636.0782)}
+[Step]: 30000 | [Train losses]: {'l_g': tensor(1.8434), 'l_d': tensor(1.2259), 'l_t': tensor(0.3465), 'l_f': tensor(2.4323e-05), 'l_w': tensor(37.9436), 'l_feat': tensor(0.6294), 'tr_entropy': tensor(1636.0638)}
+[Step]: 30000 | [Valid losses]: {'val_l_t': tensor(0.3420), 'sdr_tt': tensor(4.2105), 'val_entropy': tensor(1636.0782)}
+[Step]: 32000 | [Train losses]: {'l_g': tensor(1.8997), 'l_d': tensor(1.1858), 'l_t': tensor(0.3508), 'l_f': tensor(2.2252e-05), 'l_w': tensor(37.1482), 'l_feat': tensor(0.6304), 'tr_entropy': tensor(1636.0638)}
+[Step]: 32000 | [Valid losses]: {'val_l_t': tensor(0.3517), 'sdr_tt': tensor(4.1232), 'val_entropy': tensor(1636.0782)}
+[Step]: 34000 | [Train losses]: {'l_g': tensor(1.9078), 'l_d': tensor(1.1858), 'l_t': tensor(0.3981), 'l_f': tensor(2.4273e-05), 'l_w': tensor(39.2095), 'l_feat': tensor(0.6356), 'tr_entropy': tensor(1636.0638)}
+[Step]: 34000 | [Valid losses]: {'val_l_t': tensor(0.3342), 'sdr_tt': tensor(4.3172), 'val_entropy': tensor(1636.0782)}
+[Step]: 36000 | [Train losses]: {'l_g': tensor(1.8945), 'l_d': tensor(1.1827), 'l_t': tensor(0.3522), 'l_f': tensor(2.1338e-05), 'l_w': tensor(37.2594), 'l_feat': tensor(0.6228), 'tr_entropy': tensor(1636.0638)}
+[Step]: 36000 | [Valid losses]: {'val_l_t': tensor(0.3445), 'sdr_tt': tensor(4.3059), 'val_entropy': tensor(1636.0782)}
+[Step]: 38000 | [Train losses]: {'l_g': tensor(1.9259), 'l_d': tensor(1.1668), 'l_t': tensor(0.3854), 'l_f': tensor(2.2555e-05), 'l_w': tensor(40.3135), 'l_feat': tensor(0.6279), 'tr_entropy': tensor(1636.0638)}
+[Step]: 38000 | [Valid losses]: {'val_l_t': tensor(0.3412), 'sdr_tt': tensor(4.3057), 'val_entropy': tensor(1636.0782)}
+[Step]: 40000 | [Train losses]: {'l_g': tensor(1.9055), 'l_d': tensor(1.1863), 'l_t': tensor(0.3561), 'l_f': tensor(2.2936e-05), 'l_w': tensor(39.3328), 'l_feat': tensor(0.6297), 'tr_entropy': tensor(1636.0638)}
+[Step]: 40000 | [Valid losses]: {'val_l_t': tensor(0.3228), 'sdr_tt': tensor(4.5039), 'val_entropy': tensor(1636.0782)}
+[Step]: 42000 | [Train losses]: {'l_g': tensor(1.8965), 'l_d': tensor(1.1945), 'l_t': tensor(0.4125), 'l_f': tensor(2.4567e-05), 'l_w': tensor(96.7240), 'l_feat': tensor(0.6218), 'tr_entropy': tensor(1636.0638)}
+[Step]: 42000 | [Valid losses]: {'val_l_t': tensor(0.3369), 'sdr_tt': tensor(4.2965), 'val_entropy': tensor(1636.0782)}
+[Step]: 44000 | [Train losses]: {'l_g': tensor(1.9300), 'l_d': tensor(1.1645), 'l_t': tensor(0.3614), 'l_f': tensor(2.2774e-05), 'l_w': tensor(40.0612), 'l_feat': tensor(0.6300), 'tr_entropy': tensor(1636.0638)}
+[Step]: 44000 | [Valid losses]: {'val_l_t': tensor(0.3337), 'sdr_tt': tensor(4.4332), 'val_entropy': tensor(1636.0782)}
+[Step]: 46000 | [Train losses]: {'l_g': tensor(1.9196), 'l_d': tensor(1.1693), 'l_t': tensor(0.3460), 'l_f': tensor(2.1485e-05), 'l_w': tensor(37.3351), 'l_feat': tensor(0.6200), 'tr_entropy': tensor(1636.0638)}
+[Step]: 46000 | [Valid losses]: {'val_l_t': tensor(0.3310), 'sdr_tt': tensor(4.3133), 'val_entropy': tensor(1636.0782)}
+[Step]: 48000 | [Train losses]: {'l_g': tensor(1.9494), 'l_d': tensor(1.1492), 'l_t': tensor(0.4750), 'l_f': tensor(2.4110e-05), 'l_w': tensor(49.8736), 'l_feat': tensor(0.6284), 'tr_entropy': tensor(1636.0638)}
+[Step]: 48000 | [Valid losses]: {'val_l_t': tensor(0.3320), 'sdr_tt': tensor(4.4216), 'val_entropy': tensor(1636.0782)}
+[Step]: 50000 | [Train losses]: {'l_g': tensor(1.9279), 'l_d': tensor(1.1763), 'l_t': tensor(0.3485), 'l_f': tensor(2.0519e-05), 'l_w': tensor(37.9815), 'l_feat': tensor(0.6158), 'tr_entropy': tensor(1636.0638)}
+[Step]: 50000 | [Valid losses]: {'val_l_t': tensor(0.3278), 'sdr_tt': tensor(4.4323), 'val_entropy': tensor(1636.0782)}
+[Step]: 52000 | [Train losses]: {'l_g': tensor(1.9441), 'l_d': tensor(1.1685), 'l_t': tensor(0.3629), 'l_f': tensor(2.0425e-05), 'l_w': tensor(38.7092), 'l_feat': tensor(0.6208), 'tr_entropy': tensor(1636.0638)}
+[Step]: 52000 | [Valid losses]: {'val_l_t': tensor(0.3368), 'sdr_tt': tensor(4.4317), 'val_entropy': tensor(1636.0782)}
+[Step]: 54000 | [Train losses]: {'l_g': tensor(1.9233), 'l_d': tensor(1.1736), 'l_t': tensor(0.3412), 'l_f': tensor(2.0223e-05), 'l_w': tensor(38.1453), 'l_feat': tensor(0.6127), 'tr_entropy': tensor(1636.0638)}
+[Step]: 54000 | [Valid losses]: {'val_l_t': tensor(0.3372), 'sdr_tt': tensor(4.3933), 'val_entropy': tensor(1636.0782)}
+[Step]: 56000 | [Train losses]: {'l_g': tensor(1.9519), 'l_d': tensor(1.1686), 'l_t': tensor(0.3970), 'l_f': tensor(2.3240e-05), 'l_w': tensor(39.0810), 'l_feat': tensor(0.6362), 'tr_entropy': tensor(1636.0638)}
+[Step]: 56000 | [Valid losses]: {'val_l_t': tensor(0.3338), 'sdr_tt': tensor(4.2345), 'val_entropy': tensor(1636.0782)}
+[Step]: 58000 | [Train losses]: {'l_g': tensor(1.9072), 'l_d': tensor(1.1787), 'l_t': tensor(0.3400), 'l_f': tensor(1.8390e-05), 'l_w': tensor(38.0792), 'l_feat': tensor(0.5976), 'tr_entropy': tensor(1636.0638)}
+[Step]: 58000 | [Valid losses]: {'val_l_t': tensor(0.3451), 'sdr_tt': tensor(4.3426), 'val_entropy': tensor(1636.0782)}
+[Step]: 60000 | [Train losses]: {'l_g': tensor(1.9385), 'l_d': tensor(1.1783), 'l_t': tensor(0.3702), 'l_f': tensor(2.1935e-05), 'l_w': tensor(38.3123), 'l_feat': tensor(0.6300), 'tr_entropy': tensor(1636.0638)}
+[Step]: 60000 | [Valid losses]: {'val_l_t': tensor(0.3179), 'sdr_tt': tensor(4.7002), 'val_entropy': tensor(1636.0782)}
+[Step]: 62000 | [Train losses]: {'l_g': tensor(1.9708), 'l_d': tensor(1.1475), 'l_t': tensor(0.3446), 'l_f': tensor(2.0874e-05), 'l_w': tensor(36.6794), 'l_feat': tensor(0.6172), 'tr_entropy': tensor(1636.0638)}
+[Step]: 62000 | [Valid losses]: {'val_l_t': tensor(0.3299), 'sdr_tt': tensor(4.5041), 'val_entropy': tensor(1636.0782)}
+[Step]: 64000 | [Train losses]: {'l_g': tensor(1.9081), 'l_d': tensor(1.1832), 'l_t': tensor(0.3410), 'l_f': tensor(2.1260e-05), 'l_w': tensor(37.6295), 'l_feat': tensor(0.6130), 'tr_entropy': tensor(1636.0638)}
+[Step]: 64000 | [Valid losses]: {'val_l_t': tensor(0.3369), 'sdr_tt': tensor(4.3115), 'val_entropy': tensor(1636.0782)}
+[Step]: 66000 | [Train losses]: {'l_g': tensor(1.9764), 'l_d': tensor(1.1346), 'l_t': tensor(0.3509), 'l_f': tensor(1.9954e-05), 'l_w': tensor(37.8322), 'l_feat': tensor(0.6186), 'tr_entropy': tensor(1636.0638)}
+[Step]: 66000 | [Valid losses]: {'val_l_t': tensor(0.3334), 'sdr_tt': tensor(4.5739), 'val_entropy': tensor(1636.0782)}
+[Step]: 68000 | [Train losses]: {'l_g': tensor(1.9632), 'l_d': tensor(1.1348), 'l_t': tensor(0.3799), 'l_f': tensor(2.0623e-05), 'l_w': tensor(38.9375), 'l_feat': tensor(0.6159), 'tr_entropy': tensor(1636.0638)}
+[Step]: 68000 | [Valid losses]: {'val_l_t': tensor(0.3358), 'sdr_tt': tensor(4.3295), 'val_entropy': tensor(1636.0782)}
+[Step]: 70000 | [Train losses]: {'l_g': tensor(1.9703), 'l_d': tensor(1.1303), 'l_t': tensor(0.3545), 'l_f': tensor(1.9525e-05), 'l_w': tensor(37.5425), 'l_feat': tensor(0.6112), 'tr_entropy': tensor(1636.0638)}
+[Step]: 70000 | [Valid losses]: {'val_l_t': tensor(0.3213), 'sdr_tt': tensor(4.4472), 'val_entropy': tensor(1636.0782)}
+[Step]: 72000 | [Train losses]: {'l_g': tensor(1.9772), 'l_d': tensor(1.1318), 'l_t': tensor(0.3760), 'l_f': tensor(1.9854e-05), 'l_w': tensor(39.4293), 'l_feat': tensor(0.6145), 'tr_entropy': tensor(1636.0638)}
+[Step]: 72000 | [Valid losses]: {'val_l_t': tensor(0.3355), 'sdr_tt': tensor(4.4339), 'val_entropy': tensor(1636.0782)}
+[Step]: 74000 | [Train losses]: {'l_g': tensor(1.9614), 'l_d': tensor(1.1474), 'l_t': tensor(0.3521), 'l_f': tensor(2.1002e-05), 'l_w': tensor(39.6708), 'l_feat': tensor(0.6192), 'tr_entropy': tensor(1636.0638)}
+[Step]: 74000 | [Valid losses]: {'val_l_t': tensor(0.3440), 'sdr_tt': tensor(4.5316), 'val_entropy': tensor(1636.0782)}
+[Step]: 76000 | [Train losses]: {'l_g': tensor(1.9620), 'l_d': tensor(1.1418), 'l_t': tensor(0.4029), 'l_f': tensor(2.1181e-05), 'l_w': tensor(62.2733), 'l_feat': tensor(0.6054), 'tr_entropy': tensor(1636.0638)}
+[Step]: 76000 | [Valid losses]: {'val_l_t': tensor(0.3240), 'sdr_tt': tensor(4.6706), 'val_entropy': tensor(1636.0782)}
+[Step]: 78000 | [Train losses]: {'l_g': tensor(1.9691), 'l_d': tensor(1.1501), 'l_t': tensor(0.3635), 'l_f': tensor(2.1422e-05), 'l_w': tensor(39.0942), 'l_feat': tensor(0.6226), 'tr_entropy': tensor(1636.0638)}
+[Step]: 78000 | [Valid losses]: {'val_l_t': tensor(0.4031), 'sdr_tt': tensor(3.3849), 'val_entropy': tensor(1636.0782)}
+[Step]: 80000 | [Train losses]: {'l_g': tensor(2.0024), 'l_d': tensor(1.1032), 'l_t': tensor(0.4715), 'l_f': tensor(2.2248e-05), 'l_w': tensor(46.0408), 'l_feat': tensor(0.6136), 'tr_entropy': tensor(1636.0638)}
+[Step]: 80000 | [Valid losses]: {'val_l_t': tensor(0.3344), 'sdr_tt': tensor(4.5655), 'val_entropy': tensor(1636.0782)}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 421, in <module>
+    batch_entropy = entropy_rate(qtz_emb)
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 101, in entropy_rate
+    e = torch.sum(n*torch.log2(n))
+                    ^^^^^^^^^^^^^
+KeyboardInterrupt

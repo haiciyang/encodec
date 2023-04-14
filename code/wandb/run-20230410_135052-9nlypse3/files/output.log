@@ -1,0 +1,17 @@
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (17) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (33) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (65) may be set too low.
+  warnings.warn(
+/home/anakuzne/miniconda3/envs/encodec/lib/python3.11/site-packages/torchaudio/functional/functional.py:576: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (64) may be set too high. Or, the value for `n_freqs` (129) may be set too low.
+  warnings.warn(
+[Step]: 0 | [Train losses]: {'l_g': tensor(0.0023), 'l_d': tensor(0.0048), 'l_t': tensor(0.0004), 'l_f': tensor(1.0767e-08), 'l_w': tensor(0.1091), 'l_feat': tensor(0.0009), 'tr_entropy': tensor(3.2722)}
+[Step]: 0 | [Valid losses]: {'val_l_t': tensor(0.2466), 'sdr_tt': tensor(6.4331), 'val_entropy': tensor(1636.0782)}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/anakuzne/projects/encodec_hy/encodec/code/encodec/dist_train.py", line 480, in <module>
+    d_loss += l_d.detach().data.cpu()
+              ^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
