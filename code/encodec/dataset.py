@@ -18,7 +18,7 @@ class EnCodec_data(Dataset):
 		self.df_part = self.df[self.df['part']==task]
 		self.mixture = mixture
 		self.standardize = standardize
-		self.mixture_data = [f'{ds_path}/musan/noise/free-sound', f{ds_path}'/musan/noise/sound-bible']
+		self.mixture_data = [f'{ds_path}/musan/noise/free-sound', f'{ds_path}/musan/noise/sound-bible']
 
 	def __len__(self):
 		return len(self.df_part)
