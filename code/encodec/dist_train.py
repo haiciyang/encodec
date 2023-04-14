@@ -274,7 +274,9 @@ if __name__ == '__main__':
     freq_str = f'disc_freq{inp_args.disc_freq}'
     std_str = 'std' if {inp_args.standardize} else 'no_std'
     from_ls = 'from_ls' if inp_args.from_ls else ''
-    run_name = f"{inp_args.exp_name}_lr{inp_args.lr_gen}_bw{inp_args.bandwidth}_{se_str}_{disc_str}_{freq_str}_{std_str}_{from_ls}"
+    latent_se_str = 'proposed' if inp_args.use_latent_se_loss else ''
+
+    run_name = f"{inp_args.exp_name}_lr{inp_args.lr_gen}_bw{inp_args.bandwidth}_{se_str}_{disc_str}_{freq_str}_{std_str}_{from_ls}_{latent_se_str}"
 
     if inp_args.freeze_dec or inp_args.freeze_enc:
         freeze_str = "freeze_enc" if inp_args.freeze_enc else "freeze_dec"
@@ -295,7 +297,7 @@ if __name__ == '__main__':
     tot_steps = 1000000
     track_sdr = torch.tensor(float('-inf'))
 
-    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, ep_entropy = 0,0,0,0,0,0,0
+    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, l_lat = 0,0,0,0,0,0,0
     model.train()
 
     curr_time = round(time.time()*1000)
@@ -338,6 +340,9 @@ if __name__ == '__main__':
             l_w = quantizedResult.penalty # commitment loss
             l_t = torch.mean(torch.abs(s - s_hat))
             l_f = melspec_loss(s, s_hat, gpu_rank, range(5,12))
+            if inp_args.use_latent_se_loss:
+                l_l = reconstruction2D(qtz_emb_s, qtz_emb_x)
+                l_lat += l_l.detach().data.cpu()
 
             t_loss += l_t.detach().data.cpu()
             f_loss += l_f.detach().data.cpu()
@@ -368,8 +373,13 @@ if __name__ == '__main__':
                 feat_loss += l_feat.detach().data.cpu()
 
                 l_w.backward(retain_graph=True)
-                losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
-                balancer = Balancer(weights={'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
+                if inp_args.use_latent_se_loss:
+                    losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat, 'l_l':l_l}
+                    balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3, 'l_l':float(inp_args.ll_weight)}
+                else:
+                    losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
+                    balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}
+                balancer = Balancer(weights=balancer_weights, rescale_grads=True)
                 balancer.backward(losses, s_hat)
                 optimizer_G.step()
 
@@ -401,7 +411,8 @@ if __name__ == '__main__':
                         'l_t': t_loss/log_steps, 
                         'l_f': f_loss/log_steps, 
                         'l_w': w_loss/log_steps, 
-                        'l_feat': feat_loss/log_steps,}
+                        'l_feat': feat_loss/log_steps,
+                        'l_l': l_lat/log_steps}
                 if not inp_args.debug:
                     wandb.log(log_losses)
                 print(f"[Step]: {step} | [Train losses]: {log_losses}")
