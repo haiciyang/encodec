@@ -43,6 +43,7 @@ ENV/
 /notes
 /tmp
 /code/wandb
+/code/encodec/config
 # script outputs
 /processed
 /experiments
