@@ -20,13 +20,13 @@ disc_freq: 10
 bandwidth: 6
 batch_size: 8
 freeze_enc: False
-freeze_dec: True
+freeze_dec: False
 sr: 16000
 
-use_se_loss: False
-use_latent_se_loss: True
-lt_weight: 1
+use_se_loss: True
+use_latent_se_loss: False
+lt_weight: 3
 ll_weight: 1
 lr_gen: 3e-5
 lr_disc: 3e-5
-debug: True
+debug: False

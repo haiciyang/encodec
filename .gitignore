@@ -42,7 +42,7 @@ ENV/
 /local_scripts
 /notes
 /tmp
-
+/code/wandb
 # script outputs
 /processed
 /experiments

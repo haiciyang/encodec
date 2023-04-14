@@ -16,7 +16,7 @@ inf_output_path: "/home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs"
 #Training params
 use_disc: True
 disc_freq: 10
-bandwidth: 6
+bandwidth: 1.5
 batch_size: 8
 freeze_enc: False
 freeze_dec: False
@@ -27,4 +27,4 @@ use_latent_se_loss: False
 lt_weight: 1
 lr_gen: 3e-5
 lr_disc: 3e-5
-debug: True
+debug: False
