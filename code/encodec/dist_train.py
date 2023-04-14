@@ -89,8 +89,8 @@ def reconstruction2D(s, x):
     B, C, L = s.shape
     s = s.reshape(B, C*L)
     x = x.reshape(B, C*L)
-    loss = torch.mean(torch.abs(s-x), dim=-1)
-    return loss
+    loss = torch.sum(torch.abs(s-x), dim=-1)
+    return loss.mean()
 
 def entropy_rate(emb):
     '''
@@ -322,10 +322,10 @@ if __name__ == '__main__':
             # [64, 128, 50]
             frame_rate = 16000 // model.encoder.hop_length
             if inp_args.use_latent_se_loss:
-                quantizedResult = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
-                qtz_emb_x = quantizedResult.quantized
-                quantizedResult = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
-                qtz_emb_s = quantizedResult.quantized
+                quantizedResult_x = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
+                qtz_emb_x = quantizedResult_x.quantized
+                quantizedResult_s = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
+                qtz_emb_s = quantizedResult_s.quantized
                 s_hat = model.decoder(qtz_emb_s)
             else:
                 quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=inp_args.bandwidth) # !!! should be frame_rate - 50
@@ -337,7 +337,10 @@ if __name__ == '__main__':
             optimizer_G.zero_grad()
 
             # ---- VQ Commitment loss l_w -----
-            l_w = quantizedResult.penalty # commitment loss
+            if inp_args.use_latent_se_loss:
+                l_w = quantizedResult_s.penalty
+            else:
+                l_w = quantizedResult.penalty # commitment loss
             l_t = torch.mean(torch.abs(s - s_hat))
             l_f = melspec_loss(s, s_hat, gpu_rank, range(5,12))
             if inp_args.use_latent_se_loss:
@@ -373,12 +376,16 @@ if __name__ == '__main__':
                 feat_loss += l_feat.detach().data.cpu()
 
                 l_w.backward(retain_graph=True)
+
                 if inp_args.use_latent_se_loss:
-                    losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat, 'l_l':l_l}
-                    balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3, 'l_l':float(inp_args.ll_weight)}
-                else:
-                    losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
-                    balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}
+                    l_l = float(inp_args.ll_weight) * l_l
+                    l_l.backward(retain_graph=True)
+                #if inp_args.use_latent_se_loss:
+                #    losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat, 'l_l':l_l}
+                #    balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3, 'l_l':float(inp_args.ll_weight)}
+                #else:
+                losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
+                balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}
                 balancer = Balancer(weights=balancer_weights, rescale_grads=True)
                 balancer.backward(losses, s_hat)
                 optimizer_G.step()
@@ -416,7 +423,7 @@ if __name__ == '__main__':
                 if not inp_args.debug:
                     wandb.log(log_losses)
                 print(f"[Step]: {step} | [Train losses]: {log_losses}")
-                g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, ep_entropy = 0,0,0,0,0,0,0
+                g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, l_lat = 0,0,0,0,0,0,0
 
                 model.eval()
                 with torch.no_grad():
