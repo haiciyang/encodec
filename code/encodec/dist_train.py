@@ -435,7 +435,6 @@ if __name__ == '__main__':
                     #If SDR is larger than previous, save new checkpoint
                     
                     if vall > track_sdr:
-                        print(f'Prev SDR {track_sdr}, Curr SDR {vall}')
                         track_sdr = vall
                         torch.save(model.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_best.amlt')
                         torch.save(disc.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_disc_best.amlt')
