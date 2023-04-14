@@ -82,6 +82,16 @@ def cal_sdr(s, s_hat):
         torch.sum((s - s_hat)**2, -1) / torch.sum(s**2, -1))
     )
 
+def reconstruction2D(s, x):
+    '''
+    Reconstruction loss on latent representations.
+    '''
+    B, C, L = s.shape
+    s = s.reshape(B, C*L)
+    x = x.reshape(B, C*L)
+    loss = torch.mean(torch.abs(s-x), dim=-1)
+    return loss
+
 def entropy_rate(emb):
     '''
     Average entropy rate per batch
@@ -129,147 +139,6 @@ def freeze_params(model, param_name):
     for name, param in model.named_parameters():
         if param_name in name:
             param.requires_grad = False
-
-def train(model, disc, train_loader, valid_loader,
-         bandwidth, optimizer_G, optimizer_D, 
-         gpu_rank, use_disc, disc_freq, use_se_loss, debug, 
-         output_dir, exp_name):
-
-    # ---------- Run model ------------
-    loss = torch.tensor(float('-inf'))
-    g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, ep_entropy = 0,0,0,0,0,0,0
-
-    steps = 0
-    num_steps = 500
-
-    model.train()
-    for idx, batch in enumerate(train_loader):
-        s, x = batch
-        # s shape (64, 1, 16000)
-        s = s.to(torch.float).cuda(gpu_rank)
-        x = x.to(torch.float).cuda(gpu_rank)
-        if use_se_loss:
-            emb = model.encoder(x)
-        else:
-            emb = model.encoder(s)
-        
-         # [64, 128, 50]
-        frame_rate = 16000 // model.encoder.hop_length
-        quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
-            # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
-        qtz_emb = quantizedResult.quantized
-        #batch_entropy = entropy_rate(qtz_emb)
-        #ep_entropy+=batch_entropy.data
-        s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
-
-        # --- Update Generator ---
-        optimizer_G.zero_grad()
-
-         # ---- VQ Commitment loss l_w -----
-        l_w = quantizedResult.penalty # commitment loss
-        l_t = torch.mean(torch.abs(s - s_hat))
-        l_f = melspec_loss(s, s_hat, gpu_rank, range(5,12))
-
-        t_loss += l_t.detach().data.cpu()
-        f_loss += l_f.detach().data.cpu()
-        w_loss += l_w.detach().data.cpu()
-
-        # ---- Discriminator l_d, l_g, l_feat -----
-
-        if use_disc:
-            s_disc_r, fmap_r = disc(s) # list of the outputs from each discriminator
-            s_disc_gen, fmap_gen = disc(s_hat)
-
-            # s_disc_r: [3*[batch_size*[1, 309, 65]]]
-            # fmap_r: [3*5*torch.Size([64, 32, 59, 513/257/128..])] 5 conv layers, different stride size
-            K = len(fmap_gen)
-            L = len(fmap_gen[0])
-
-            l_g = 0
-            l_feat = 0
-
-            for d_id in range(len(fmap_r)):
-
-                l_g += 1/K * torch.mean(torch.max(torch.tensor(0), 1-s_disc_gen[d_id])) # Gen loss
-
-                for l_id in range(len(fmap_r[0])):
-                    l_feat += 1/(K*L) * torch.mean(abs(fmap_r[d_id][l_id] - \
-                            fmap_gen[d_id][l_id]))/torch.mean(abs(fmap_r[d_id][l_id]))
-
-            g_loss += l_g.detach().data.cpu()
-            feat_loss += l_feat.detach().data.cpu()
-
-            l_w.backward(retain_graph=True)
-            losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
-            balancer = Balancer(weights={'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}, rescale_grads=True)
-            balancer.backward(losses, s_hat)
-
-
-            # loss = 0.1 * l_t + l_f + 3 * l_g + 3 * l_feat + l_w
-            # loss.backward()
-
-            optimizer_G.step()
-
-             # Update Discriminator
-            if idx % disc_freq == 0:
-                optimizer_D.zero_grad()
-
-                l_d = 0
-                s_disc_r, fmap_r = disc(s) # list of the outputs from each discriminator
-                s_disc_gen, fmap_gen = disc(s_hat.detach())
-            
-                for d_id in range(len(fmap_r)):
-                    l_d += 1/K * torch.mean(torch.max(torch.tensor(0), 1-s_disc_r[d_id]) + torch.max(torch.tensor(0), 1+s_disc_gen[d_id])) # Disc loss
-
-                l_d.backward()
-                optimizer_D.step()
-
-                d_loss += l_d.detach().data.cpu()
-
-            else:
-                loss = 0.1 * l_t + l_f + l_w
-                loss.backward()
-                optimizer_G.step()
-                # dist.barrier()
-            
-            #Log losses for wandb
-        if steps%num_steps==0:
-            log_losses = {'l_g': g_loss/steps, 
-                    'l_d': d_loss/steps, 
-                    'l_t': t_loss/steps, 
-                    'l_f': f_loss/steps, 
-                    'l_w': w_loss/steps, 
-                    'l_feat': feat_loss/steps,
-                }
-
-            wandb.log(log_losses)
-
-            model.eval()
-            with torch.no_grad():
-                val_losses = valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug)
-                wandb.log(val_losses)
-                vall = list(val_losses.values())[-1] # sdr
-                if vall > loss:
-                    loss = vall
-                    if not inp_args.debug:
-                        torch.save(model.state_dict(), f'{output_dir}/{exp_name}.amlt')
-                        torch.save(disc.state_dict(), f'{output_dir}/{exp_name}_disc.amlt')
-            model.train()
-        steps+=1
-
-
-        if debug:
-            break
-    if use_disc:
-        losses = {'l_g': g_loss/len(train_loader), 
-                        'l_d': d_loss/len(train_loader)*disc_freq, 
-                        'l_t': t_loss/len(train_loader), 
-                        'l_f': f_loss/len(train_loader), 
-                        'l_w': w_loss/len(train_loader), 
-                        'l_feat': feat_loss/len(train_loader)}
-    else:
-        losses = {'l_t': t_loss/len(train_loader), 'l_f': f_loss/len(train_loader), 'l_w': w_loss/len(train_loader)}
-
 
 def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
 
@@ -338,10 +207,28 @@ def get_args():
     #     print(f"II Environment variables not set: {', '.join(missing)}.")
     return args
 
+def check_config(inp_args):
+    all_valid = True
+    if inp_args.use_se_loss and inp_args.use_latent_se_loss:
+        print(f"use_se_loss and use_latent_se_loss cannot be used together")
+        all_valid = False
+    if (inp_args.mixture==False) and (inp_args.use_se_loss or inp_args.use_latent_se_loss):
+        print("use_se_loss and use_latent_se_loss require mixture=True")
+        all_valid = False
+
+    if inp_args.freeze_dec==True and inp_args.freeze_enc==True:
+        print("Both encoder and decoder cannot be frozen")
+        all_valid =False
+    return all_valid
 
 if __name__ == '__main__':
     config = sys.argv[1]
     inp_args, config_dict = load_config(config)
+    config_status = check_config(inp_args)
+    if config_status==False:
+        exit()
+    else:
+        print("Checked arguments...")
 
     train_dataset = EnCodec_data(ds_path=inp_args.data_path, csv_path=inp_args.csv_path, task = 'train', mixture=inp_args.mixture, standardize=inp_args.standardize)
     valid_dataset = EnCodec_data(ds_path=inp_args.data_path, csv_path=inp_args.csv_path, task = 'val',  mixture=inp_args.mixture, standardize=inp_args.standardize)
@@ -424,17 +311,25 @@ if __name__ == '__main__':
 
             if inp_args.use_se_loss:
                 emb = model.encoder(x)
+            elif inp_args.use_latent_se_loss:
+                emb_x = model.encoder(x)
+                emb_s = model.encoder(s)
             else:
                 emb = model.encoder(s)
         
             # [64, 128, 50]
             frame_rate = 16000 // model.encoder.hop_length
-            quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=inp_args.bandwidth) # !!! should be frame_rate - 50
-                # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
-            qtz_emb = quantizedResult.quantized
-            #batch_entropy = entropy_rate(qtz_emb)
-            #ep_entropy+=batch_entropy.data
-            s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
+            if inp_args.use_latent_se_loss:
+                quantizedResult = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
+                qtz_emb_x = quantizedResult.quantized
+                quantizedResult = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
+                qtz_emb_s = quantizedResult.quantized
+                s_hat = model.decoder(qtz_emb_s)
+            else:
+                quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=inp_args.bandwidth) # !!! should be frame_rate - 50
+                    # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
+                qtz_emb = quantizedResult.quantized
+                s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
             # --- Update Generator ---
             optimizer_G.zero_grad()
