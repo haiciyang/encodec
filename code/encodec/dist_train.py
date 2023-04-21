@@ -173,65 +173,6 @@ def valid(model, valid_loader, bandwidth, gpu_rank, mixture, debug):
     losses = {'val_l_t': t_loss/len(valid_loader), 'sdr_tt': sdr_tt/len(valid_loader)}
     return losses
 
-def valid_latent_only(model, valid_loader, bandwidth, gpu_rank, mixture, debug):
-    lat_loss = 0
-    for idx, batch in enumerate(valid_loader):
-
-        # s shape (64, 1, 16000)
-        s, x = batch
-        s = s.to(torch.float).cuda(gpu_rank)
-        x = x.to(torch.float).cuda(gpu_rank)
-       
-        emb_x = model.encoder(x)
-        emb_s = model.encoder(s) # [64, 128, 50]
-        frame_rate = 16000 // model.encoder.hop_length
-        quantizedResult_x = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
-        quantizedResult_s = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=bandwidth)
-        qtz_emb_x = quantizedResult_x.quantized
-        qtz_emb_s = quantizedResult_s.quantized
-
-        # ------ Reconstruction loss l_t, l_f --------
-        l_l = reconstruction2D(qtz_emb_s, qtz_emb_x)
-        lat_loss += l_l.detach().data.cpu()
-        if debug:
-            break
-    losses = {'val_l_l': lat_loss/len(valid_loader)}
-    return losses
-
-
-
-def get_args():
-    
-    envvars = [
-    "WORLD_SIZE",
-    "RANK",
-    "LOCAL_RANK",
-    "NODE_RANK",
-    "NODE_COUNT",
-    "HOSTNAME",
-    "MASTER_ADDR",
-    "MASTER_PORT",
-    "NCCL_SOCKET_IFNAME",
-    "OMPI_COMM_WORLD_RANK",
-    "OMPI_COMM_WORLD_SIZE",
-    "OMPI_COMM_WORLD_LOCAL_RANK",
-    "AZ_BATCHAI_MPI_MASTER_NODE",
-    ]
-    args = dict(gpus_per_node=torch.cuda.device_count())
-    missing = []
-    for var in envvars:
-        if var in os.environ:
-            args[var] = os.environ.get(var)
-            try:
-                args[var] = int(args[var])
-            except ValueError:
-                pass
-        else:
-            missing.append(var)
-    # print(f"II Args: {args}")
-    # if missing:
-    #     print(f"II Environment variables not set: {', '.join(missing)}.")
-    return args
 
 def check_config(inp_args):
     all_valid = True
