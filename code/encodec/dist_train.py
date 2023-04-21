@@ -89,8 +89,9 @@ def reconstruction2D(s, x):
     B, C, L = s.shape
     s = s.reshape(B, C*L)
     x = x.reshape(B, C*L)
-    loss = torch.sum(torch.abs(s-x), dim=-1)
-    return loss.mean()
+    loss = torch.nn.functional.mse_loss(s, x, reduction='mean')
+    return loss
+
 
 def entropy_rate(emb):
     '''
@@ -140,7 +141,7 @@ def freeze_params(model, param_name):
         if param_name in name:
             param.requires_grad = False
 
-def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
+def valid(model, valid_loader, bandwidth, gpu_rank, mixture, debug):
 
     # ---------- Run model ------------
     t_loss, sdr_tt, val_entropy = 0, 0, 0
@@ -150,7 +151,7 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
         s, x = batch
         s = s.to(torch.float).cuda(gpu_rank)
         x = x.to(torch.float).cuda(gpu_rank)
-        if use_se_loss:
+        if mixture:
             emb = model.encoder(x)
         else:
             emb = model.encoder(s) # [64, 128, 50]
@@ -158,8 +159,6 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
         quantizedResult = model.quantizer(emb, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
             # Resutls contain - quantized, codes, bw, penalty=torch.mean(commit_loss))
         qtz_emb = quantizedResult.quantized
-        #batch_entropy = entropy_rate(qtz_emb)
-        #val_entropy+=batch_entropy
         s_hat = model.decoder(qtz_emb) #(64, 1, 16000)
 
         # ------ Reconstruction loss l_t, l_f --------
@@ -173,6 +172,33 @@ def valid(model, valid_loader, bandwidth, gpu_rank, use_se_loss, debug):
             break
     losses = {'val_l_t': t_loss/len(valid_loader), 'sdr_tt': sdr_tt/len(valid_loader)}
     return losses
+
+def valid_latent_only(model, valid_loader, bandwidth, gpu_rank, mixture, debug):
+    lat_loss = 0
+    for idx, batch in enumerate(valid_loader):
+
+        # s shape (64, 1, 16000)
+        s, x = batch
+        s = s.to(torch.float).cuda(gpu_rank)
+        x = x.to(torch.float).cuda(gpu_rank)
+       
+        emb_x = model.encoder(x)
+        emb_s = model.encoder(s) # [64, 128, 50]
+        frame_rate = 16000 // model.encoder.hop_length
+        quantizedResult_x = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
+        quantizedResult_s = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=bandwidth)
+        qtz_emb_x = quantizedResult_x.quantized
+        qtz_emb_s = quantizedResult_s.quantized
+
+        # ------ Reconstruction loss l_t, l_f --------
+        l_l = reconstruction2D(qtz_emb_s, qtz_emb_x)
+        lat_loss += l_l.detach().data.cpu()
+        if debug:
+            break
+    losses = {'val_l_l': lat_loss/len(valid_loader)}
+    return losses
+
+
 
 def get_args():
     
@@ -269,6 +295,8 @@ if __name__ == '__main__':
         which = 'decoder' if inp_args.freeze_dec else 'encoder'
         freeze_params(model, which)
     
+
+    ########RUN NAME ############
     se_str = f'se_lt_weight_{inp_args.lt_weight}' if inp_args.use_se_loss else ''
     disc_str = 'with_disc' if inp_args.finetune_disc else ''
     freq_str = f'disc_freq{inp_args.disc_freq}'
@@ -283,6 +311,12 @@ if __name__ == '__main__':
     else:
         freeze_str = 'all_unfreeze'
     print(f"RUN NAME: {run_name}")
+
+    curr_time = round(time.time()*1000)
+    if not os.path.exists(f"{inp_args.output_dir}/{curr_time}"):
+        os.makedirs(f"{inp_args.output_dir}/{curr_time}")
+    
+    config_dict['save_prefix'] = f"{inp_args.output_dir}/{curr_time}/{run_name}"
 
     if not inp_args.debug:
         wandb.init(config=config_dict, project='encodec-se', entity='anakuzne')
@@ -299,10 +333,6 @@ if __name__ == '__main__':
 
     g_loss, d_loss, t_loss, f_loss, w_loss, feat_loss, l_lat = 0,0,0,0,0,0,0
     model.train()
-
-    curr_time = round(time.time()*1000)
-    if not os.path.exists(f"{inp_args.output_dir}/{curr_time}"):
-        os.makedirs(f"{inp_args.output_dir}/{curr_time}")
 
     for ep in range(2000):
         for idx, batch in enumerate(train_loader):
@@ -337,16 +367,14 @@ if __name__ == '__main__':
             optimizer_G.zero_grad()
 
             # ---- VQ Commitment loss l_w -----
-            if inp_args.use_latent_se_loss:
-                l_w = quantizedResult_s.penalty
-            else:
-                l_w = quantizedResult.penalty # commitment loss
+         
+            l_w = quantizedResult.penalty # commitment loss
             l_t = torch.mean(torch.abs(s - s_hat))
             l_f = melspec_loss(s, s_hat, gpu_rank, range(5,12))
             if inp_args.use_latent_se_loss:
                 l_l = reconstruction2D(qtz_emb_s, qtz_emb_x)
                 l_lat += l_l.detach().data.cpu()
-
+            
             t_loss += l_t.detach().data.cpu()
             f_loss += l_f.detach().data.cpu()
             w_loss += l_w.detach().data.cpu()
@@ -384,6 +412,7 @@ if __name__ == '__main__':
                 #    losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat, 'l_l':l_l}
                 #    balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3, 'l_l':float(inp_args.ll_weight)}
                 #else:
+               
                 losses = {'l_t': l_t, 'l_f': l_f, 'l_g': l_g, 'l_feat': l_feat}
                 balancer_weights = {'l_t': float(inp_args.lt_weight), 'l_f': 1, 'l_g': 3, 'l_feat': 3}
                 balancer = Balancer(weights=balancer_weights, rescale_grads=True)
@@ -407,12 +436,13 @@ if __name__ == '__main__':
                     d_loss += l_d.detach().data.cpu()
 
             else:
+                optimizer_G.step()
                 loss = (float(inp_args.lt_weight) * l_t) + l_f + l_w
                 loss.backward()
                 optimizer_G.step()
+
             
-            
-            if  step%log_steps==0:
+            if (inp_args.encoder_only==False) and (step%log_steps==0):
                 log_losses = {'l_g': g_loss/log_steps, 
                         'l_d': d_loss/log_steps, 
                         'l_t': t_loss/log_steps, 
@@ -427,7 +457,7 @@ if __name__ == '__main__':
 
                 model.eval()
                 with torch.no_grad():
-                    val_losses = valid(model, valid_loader, inp_args.bandwidth, gpu_rank, inp_args.use_se_loss, inp_args.debug)
+                    val_losses = valid(model, valid_loader, inp_args.bandwidth, gpu_rank, inp_args.mixture, inp_args.debug)
                     print(f"[Step]: {step} | [Valid losses]: {val_losses}")
                     if not inp_args.debug:
                         wandb.log(val_losses)

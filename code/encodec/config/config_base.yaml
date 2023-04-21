@@ -5,7 +5,7 @@ csv_path: "/home/anakuzne/utils/csvs/encodec_ds.csv"
 mixture: False
 standardize: True
 exp_name: "encodec_base"
-finetune_model: "/home/anakuzne/projects/encodec_ckpt/epoch1999_model.amlt"
+finetune_model: "/home/anakuzne/projects/encodec_ckpt/multi_encodec_6.amlt"
 finetune_disc: "/home/anakuzne/projects/encodec_ckpt/encodec_unstd_disc.amlt"
 from_ls: False
 
@@ -16,7 +16,7 @@ inf_output_path: "/home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs"
 #Training params
 use_disc: True
 disc_freq: 10
-bandwidth: 1.5
+bandwidth: 6
 batch_size: 8
 freeze_enc: False
 freeze_dec: False

@@ -4,29 +4,34 @@ data_path: "/data/common"
 csv_path: "/home/anakuzne/utils/csvs/encodec_ds.csv"
 mixture: True
 standardize: True
-exp_name: "encodec_ft"
-finetune_model: "/home/anakuzne/exp/encodec_04_2023/ls_pretrained/encodec_base_lr3e-5_bw3__with_disc_disc_freq5_std_all_unfreeze_best.amlt"
-finetune_disc: "/home/anakuzne/exp/encodec_04_2023/ls_pretrained/encodec_base_lr3e-5_bw3__with_disc_disc_freq5_std_all_unfreeze_disc_best.amlt"
+exp_name: "encoder_only"
+finetune_model: "/home/anakuzne/exp/encodec_04_2023/saved_models/1681777864896/encodec_ft_lr3e-5_bw6_se_lt_weight_3_with_disc_disc_freq10_std_from_ls__best.amlt"
+finetune_disc: "/home/anakuzne/exp/encodec_04_2023/saved_models/1681777864896/encodec_ft_lr3e-5_bw6_se_lt_weight_3_with_disc_disc_freq10_std_from_ls__disc_best.amlt"
 from_ls: True
 
 #For inference 
-inf_model_path: "/home/anakuzne/exp/encodec_04_2023/ls_pretrained/encodec_base_lr3e-5_bw3__with_disc_disc_freq5_std_all_unfreeze_best.amlt"
+inf_model_path: "/home/anakuzne/exp/encodec_04_2023/saved_models/1681777978883/encodec_ft_lr3e-5_bw3_se_lt_weight_3_with_disc_disc_freq10_std_from_ls__best.amlt"
 inf_output_path: "/home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs"
+task: 'test'
+plot: True
 #encodec_ft_lr3e-5_bw6_se_lt_weight_1_with_disc_disc_freq5_std_from_ls_all_unfreeze_best.amlt
+#encodec_ft_lr3e-5_bw3_se_lt_weight_3_with_disc_disc_freq10_std_from_ls_best.amlt
+#encodec_ft_lr3e-5_bw3_se_lt_weight_1_with_disc_disc_freq5_std_from_ls_best.amlt 
 
 #Training params
-use_disc: True
+use_disc: False
 disc_freq: 10
 bandwidth: 6
 batch_size: 8
 freeze_enc: False
-freeze_dec: False
+freeze_dec: True
 sr: 16000
 
-use_se_loss: True
-use_latent_se_loss: False
+encoder_only: True
+use_se_loss: False
+use_latent_se_loss: True
 lt_weight: 3
-ll_weight: 1
-lr_gen: 3e-5
-lr_disc: 3e-5
+ll_weight: 0.0002
+lr_gen: 3e-6
+lr_disc: 3e-6
 debug: False
