@@ -30,7 +30,7 @@ from .msstftd import MultiScaleSTFTDiscriminator as MSDisc
 from .balancer import Balancer
 import yaml
 import time
-from .dist_train import load_config, check_config, load_model, melspec_loss, reconstruction2D
+from .dist_train import load_config, check_config, load_model, melspec_loss, reconstruction2D, freeze_params
 
 
 
@@ -181,7 +181,7 @@ if __name__ == '__main__':
 
                 model.eval()
                 with torch.no_grad():
-                    val_losses = valid_latent_only(model, valid_loader, inp_args.bandwidth, gpu_rank, inp_args.mixture, inp_args.debug):
+                    val_losses = valid_latent_only(model, valid_loader, inp_args.bandwidth, gpu_rank, inp_args.mixture, inp_args.debug)
                     print(f"[Step]: {step} | [Valid losses]: {val_losses}")
                     if not inp_args.debug:
                         wandb.log(val_losses)
@@ -190,10 +190,7 @@ if __name__ == '__main__':
                     if vall < track_iter_loss:
                         track_iter_loss = vall
                         torch.save(model.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_best.amlt')
-                        torch.save(disc.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_disc_best.amlt')
-
                     torch.save(model.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_latest.amlt')
-                    torch.save(disc.state_dict(), f'{inp_args.output_dir}/{curr_time}/{run_name}_disc_latest.amlt')
                 model.train()
 
             step+=1
