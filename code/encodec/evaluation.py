@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     model.eval()
     idx = 0
-    num_inference = None
+    num_inference = inp_args.num_inference
 
     tot_sdr = 0
     tot_stoi = 0

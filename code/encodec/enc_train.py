@@ -97,7 +97,7 @@ if __name__ == '__main__':
     
     model.set_target_bandwidth(inp_args.bandwidth)
 
-    if inp_args.finetune_model:
+    if inp_args.finetune_model!='None':
         print("Loaded model...")
         load_model(model, inp_args.finetune_model)
 

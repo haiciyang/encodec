@@ -83,12 +83,9 @@ def cal_sdr(s, s_hat):
     )
 
 def reconstruction2D(s, x):
-    '''
-    Reconstruction loss on latent representations.
-    '''
-    B, C, L = s.shape
-    s = s.reshape(B, C*L)
-    x = x.reshape(B, C*L)
+    #B, C, L = s.shape
+    #s = s.reshape(B, C*L)
+    #x = x.reshape(B, C*L)
     loss = torch.nn.functional.mse_loss(s, x, reduction='mean')
     return loss
 

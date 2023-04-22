@@ -10,10 +10,11 @@ finetune_disc: "/home/anakuzne/exp/encodec_04_2023/saved_models/1681777864896/en
 from_ls: True
 
 #For inference 
-inf_model_path: "/home/anakuzne/exp/encodec_04_2023/saved_models/1681777978883/encodec_ft_lr3e-5_bw3_se_lt_weight_3_with_disc_disc_freq10_std_from_ls__best.amlt"
+inf_model_path: "/home/anakuzne/exp/encodec_04_2023/saved_models/1682099625841/encoder_only_lr3e-5_bw6_std_from_ls_proposed_latest.amlt"
 inf_output_path: "/home/anakuzne/projects/encodec_hy/encodec/code/eval_wavs"
 task: 'test'
 plot: True
+num_inference: 100
 #encodec_ft_lr3e-5_bw6_se_lt_weight_1_with_disc_disc_freq5_std_from_ls_all_unfreeze_best.amlt
 #encodec_ft_lr3e-5_bw3_se_lt_weight_3_with_disc_disc_freq10_std_from_ls_best.amlt
 #encodec_ft_lr3e-5_bw3_se_lt_weight_1_with_disc_disc_freq5_std_from_ls_best.amlt 
@@ -32,6 +33,6 @@ use_se_loss: False
 use_latent_se_loss: True
 lt_weight: 3
 ll_weight: 0.0002
-lr_gen: 3e-5
-lr_disc: 3e-5
+lr_gen: 1e-3
+lr_disc: 1e-3
 debug: False
