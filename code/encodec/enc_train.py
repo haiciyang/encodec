@@ -34,7 +34,7 @@ from .dist_train import load_config, check_config, load_model, melspec_loss, rec
 
 
 
-def valid_latent_only(model, valid_loader, bandwidth, gpu_rank, mixture, debug):
+def valid_latent_only(model, model_clean, valid_loader, bandwidth, gpu_rank, mixture, debug):
     lat_loss = 0
     for idx, batch in enumerate(valid_loader):
 
@@ -44,15 +44,15 @@ def valid_latent_only(model, valid_loader, bandwidth, gpu_rank, mixture, debug):
         x = x.to(torch.float).cuda(gpu_rank)
        
         emb_x = model.encoder(x)
-        emb_s = model.encoder(s) # [64, 128, 50]
+        emb_s = model_clean.encoder(s) # [64, 128, 50]
         frame_rate = 16000 // model.encoder.hop_length
-        quantizedResult_x = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
-        quantizedResult_s = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=bandwidth)
-        qtz_emb_x = quantizedResult_x.quantized
-        qtz_emb_s = quantizedResult_s.quantized
+        #quantizedResult_x = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=bandwidth) # !!! should be frame_rate - 50
+        #quantizedResult_s = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=bandwidth)
+        #qtz_emb_x = quantizedResult_x.quantized
+        #qtz_emb_s = quantizedResult_s.quantized
 
         # ------ Reconstruction loss l_t, l_f --------
-        l_l = reconstruction2D(qtz_emb_s, qtz_emb_x)
+        l_l = reconstruction2D(emb_s, emb_x)
         lat_loss += l_l.detach().data.cpu()
         if debug:
             break
