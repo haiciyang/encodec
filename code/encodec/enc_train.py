@@ -97,6 +97,17 @@ if __name__ == '__main__':
     
     model.set_target_bandwidth(inp_args.bandwidth)
 
+    model_clean = EncodecModel._get_model(
+                   target_bandwidths = [1.5, 3, 6], 
+                   sample_rate = 16000,  # 24_000
+                   channels  = 1,
+                   causal  = True,
+                   model_norm  = 'weight_norm',
+                   audio_normalize  = False,
+                   segment = None, # tp.Optional[float]
+                   name = 'unset').cuda(gpu_rank)
+    model_clean.set_target_bandwidth(inp_args.bandwidth)
+
     if inp_args.finetune_model!='None':
         print("Loaded model...")
         load_model(model, inp_args.finetune_model)
@@ -152,21 +163,21 @@ if __name__ == '__main__':
             x = x.to(torch.float).cuda(gpu_rank)
 
             emb_x = model.encoder(x)
-            emb_s = model.encoder(s)
+            emb_s = model_clean.encoder(s)
        
             # [64, 128, 50]
             frame_rate = 16000 // model.encoder.hop_length
            
-            quantizedResult_x = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
-            qtz_emb_x = quantizedResult_x.quantized
-            quantizedResult_s = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
-            qtz_emb_s = quantizedResult_s.quantized
+            #quantizedResult_x = model.quantizer(emb_x, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
+            #qtz_emb_x = quantizedResult_x.quantized
+            #quantizedResult_s = model.quantizer(emb_s, sample_rate=frame_rate, bandwidth=inp_args.bandwidth)
+            #qtz_emb_s = quantizedResult_s.quantized
 
 
             # --- Update Generator ---
             optimizer_G.zero_grad()
 
-            l_l = reconstruction2D(qtz_emb_s, qtz_emb_x)
+            l_l = reconstruction2D(emb_s, emb_x)
             l_lat += l_l.detach().data.cpu()
             #l_l = float(inp_args.ll_weight) * l_l
             l_l.backward(retain_graph=True)
